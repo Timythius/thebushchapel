@@ -1,0 +1,1209 @@
+/* ============================================
+   THE BUSH CHAPEL - Australian Bush Theme
+   ============================================ */
+
+/* CSS Custom Properties - Color Palette */
+:root {
+    /* Bush greens - gum tree inspired */
+    --gum-green-dark: #2d4a3e;
+    --gum-green: #4a7c59;
+    --gum-green-light: #7ba584;
+    --gum-green-pale: #c8dbc6;
+
+    /* Australian earth tones */
+    --ochre: #c97c4c;
+    --ochre-light: #e6a86e;
+    --terracotta: #9e5a3c;
+    --bark-brown: #5c4a3d;
+    --sand: #e8dcc4;
+    --cream: #f5f1e8;
+    --warm-white: #faf8f5;
+
+    /* Accent colors */
+    --campfire-orange: #d4763c;
+    --sunset-gold: #e8b84a;
+    --eucalyptus-blue: #7a9e9e;
+
+    /* Liturgical season colors */
+    --advent-purple: #6b4c7a;
+    --christmas-gold: #c9a227;
+    --epiphany-white: #f0ebe3;
+    --lent-purple: #5c3d5e;
+    --easter-white: #fff9e6;
+    --pentecost-red: #b33a3a;
+    --ordinary-green: #4a7c59;
+
+    /* Typography */
+    --font-display: 'Cormorant Garamond', Georgia, serif;
+    --font-body: 'Open Sans', -apple-system, sans-serif;
+
+    /* Spacing */
+    --space-xs: 0.5rem;
+    --space-sm: 1rem;
+    --space-md: 2rem;
+    --space-lg: 3rem;
+    --space-xl: 5rem;
+
+    /* Shadows */
+    --shadow-soft: 0 4px 20px rgba(93, 74, 61, 0.1);
+    --shadow-medium: 0 8px 30px rgba(93, 74, 61, 0.15);
+}
+
+/* ============================================
+   Base Styles
+   ============================================ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--bark-brown);
+    background-color: var(--warm-white);
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    line-height: 1.3;
+    color: var(--gum-green-dark);
+}
+
+h1 { font-size: 2.75rem; }
+h2 { font-size: 2.25rem; }
+h3 { font-size: 1.5rem; }
+h4 { font-size: 1.25rem; }
+
+p {
+    margin-bottom: 1rem;
+}
+
+a {
+    color: var(--gum-green);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--ochre);
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+}
+
+/* ============================================
+   Gum Leaf Decorative Elements
+   ============================================ */
+
+/* Corner gum leaf decorations using CSS shapes and gradients */
+.gum-leaf-corner {
+    position: fixed;
+    width: 200px;
+    height: 200px;
+    pointer-events: none;
+    z-index: 100;
+    opacity: 0.6;
+}
+
+.gum-leaf-corner::before,
+.gum-leaf-corner::after {
+    content: '';
+    position: absolute;
+    background: linear-gradient(135deg, var(--gum-green) 0%, var(--gum-green-light) 50%, var(--gum-green-pale) 100%);
+    border-radius: 0 80% 0 80%;
+}
+
+.top-left {
+    top: -20px;
+    left: -20px;
+}
+
+.top-left::before {
+    width: 80px;
+    height: 30px;
+    transform: rotate(-45deg);
+    top: 40px;
+    left: 20px;
+}
+
+.top-left::after {
+    width: 60px;
+    height: 24px;
+    transform: rotate(-25deg);
+    top: 60px;
+    left: 60px;
+}
+
+.top-right {
+    top: -20px;
+    right: -20px;
+}
+
+.top-right::before {
+    width: 80px;
+    height: 30px;
+    transform: rotate(45deg);
+    top: 40px;
+    right: 20px;
+}
+
+.top-right::after {
+    width: 60px;
+    height: 24px;
+    transform: rotate(25deg);
+    top: 60px;
+    right: 60px;
+}
+
+.bottom-left {
+    bottom: -20px;
+    left: -20px;
+}
+
+.bottom-left::before {
+    width: 80px;
+    height: 30px;
+    transform: rotate(45deg);
+    bottom: 40px;
+    left: 20px;
+}
+
+.bottom-right {
+    bottom: -20px;
+    right: -20px;
+}
+
+.bottom-right::before {
+    width: 80px;
+    height: 30px;
+    transform: rotate(-45deg);
+    bottom: 40px;
+    right: 20px;
+}
+
+/* Gum leaf border frame for content sections */
+.gum-border-frame {
+    position: relative;
+    background: var(--cream);
+    border: 3px solid var(--gum-green-light);
+    border-radius: 8px;
+    padding: var(--space-lg);
+    box-shadow: var(--shadow-soft);
+}
+
+.gum-border-frame::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 30px;
+    width: 50px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--gum-green) 0%, var(--gum-green-light) 100%);
+    border-radius: 0 70% 0 70%;
+    transform: rotate(-15deg);
+}
+
+.gum-border-frame::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    left: 70px;
+    width: 40px;
+    height: 16px;
+    background: linear-gradient(135deg, var(--gum-green-light) 0%, var(--gum-green-pale) 100%);
+    border-radius: 0 70% 0 70%;
+    transform: rotate(10deg);
+}
+
+/* Gum leaf video border */
+.gum-leaf-video-border {
+    position: relative;
+    background: var(--cream);
+    border: 4px solid var(--gum-green);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-medium);
+}
+
+.gum-leaf-video-border::before,
+.gum-leaf-video-border::after {
+    content: '';
+    position: absolute;
+    background: linear-gradient(45deg, var(--gum-green) 0%, var(--gum-green-light) 100%);
+    border-radius: 0 80% 0 80%;
+    z-index: 10;
+}
+
+.gum-leaf-video-border::before {
+    width: 70px;
+    height: 25px;
+    top: -5px;
+    left: 20px;
+    transform: rotate(-20deg);
+}
+
+.gum-leaf-video-border::after {
+    width: 55px;
+    height: 20px;
+    top: -3px;
+    right: 40px;
+    transform: rotate(15deg);
+}
+
+/* ============================================
+   Header
+   ============================================ */
+.main-header {
+    background: linear-gradient(180deg, var(--gum-green-dark) 0%, var(--gum-green) 100%);
+    padding: var(--space-md) var(--space-lg);
+    position: relative;
+}
+
+.main-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: repeating-linear-gradient(
+        90deg,
+        var(--gum-green-light) 0px,
+        var(--gum-green-light) 20px,
+        var(--gum-green-pale) 20px,
+        var(--gum-green-pale) 40px
+    );
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.logo-section {
+    text-align: center;
+}
+
+.logo-section h1 {
+    color: var(--warm-white);
+    font-size: 2.5rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+    margin-bottom: 0.25rem;
+}
+
+.tagline {
+    color: var(--gum-green-pale);
+    font-style: italic;
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.gum-leaf-icon {
+    width: 40px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--gum-green-pale) 0%, var(--ochre-light) 100%);
+    border-radius: 0 80% 0 80%;
+    margin: 0 auto var(--space-xs);
+    transform: rotate(-10deg);
+}
+
+.main-nav ul {
+    list-style: none;
+    display: flex;
+    gap: var(--space-md);
+    flex-wrap: wrap;
+}
+
+.main-nav a {
+    color: var(--warm-white);
+    font-weight: 600;
+    padding: var(--space-xs) var(--space-sm);
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.main-nav a:hover,
+.main-nav a.active {
+    background: rgba(255,255,255,0.15);
+    color: var(--ochre-light);
+}
+
+/* ============================================
+   Main Content
+   ============================================ */
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: var(--space-lg);
+}
+
+/* Welcome Section */
+.welcome-section {
+    margin-bottom: var(--space-xl);
+}
+
+.welcome-content {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.welcome-content h2 {
+    font-size: 2.5rem;
+    margin-bottom: var(--space-md);
+    color: var(--gum-green-dark);
+}
+
+.welcome-content p {
+    font-size: 1.1rem;
+    color: var(--bark-brown);
+    margin-bottom: var(--space-sm);
+}
+
+.cta-button {
+    display: inline-block;
+    background: linear-gradient(135deg, var(--ochre) 0%, var(--campfire-orange) 100%);
+    color: white;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: 30px;
+    font-weight: 600;
+    margin-top: var(--space-md);
+    box-shadow: var(--shadow-soft);
+    transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+    color: white;
+}
+
+/* ============================================
+   Liturgical Calendar Grid
+   ============================================ */
+.liturgical-calendar {
+    margin-bottom: var(--space-xl);
+    text-align: center;
+}
+
+.liturgical-calendar h2 {
+    margin-bottom: var(--space-sm);
+}
+
+.section-intro {
+    color: var(--gum-green);
+    font-style: italic;
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    margin-bottom: var(--space-lg);
+}
+
+.seasons-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-md);
+}
+
+.season-card {
+    background: var(--cream);
+    border-radius: 12px;
+    padding: var(--space-md);
+    text-align: center;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.3s ease;
+    border: 3px solid transparent;
+    position: relative;
+    overflow: hidden;
+}
+
+.season-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+}
+
+.season-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-medium);
+}
+
+.season-card h3 {
+    margin: var(--space-sm) 0 var(--space-xs);
+}
+
+.season-card p {
+    font-size: 0.9rem;
+    color: var(--bark-brown);
+    margin: 0;
+}
+
+.season-icon {
+    font-size: 2.5rem;
+}
+
+/* Season-specific colors */
+.season-card.advent::before { background: var(--advent-purple); }
+.season-card.advent:hover { border-color: var(--advent-purple); }
+
+.season-card.christmas::before { background: var(--christmas-gold); }
+.season-card.christmas:hover { border-color: var(--christmas-gold); }
+
+.season-card.epiphany::before { background: var(--sunset-gold); }
+.season-card.epiphany:hover { border-color: var(--sunset-gold); }
+
+.season-card.lent::before { background: var(--lent-purple); }
+.season-card.lent:hover { border-color: var(--lent-purple); }
+
+.season-card.easter::before { background: var(--christmas-gold); }
+.season-card.easter:hover { border-color: var(--christmas-gold); }
+
+.season-card.pentecost::before { background: var(--pentecost-red); }
+.season-card.pentecost:hover { border-color: var(--pentecost-red); }
+
+.season-card.ordinary::before { background: var(--ordinary-green); }
+.season-card.ordinary:hover { border-color: var(--ordinary-green); }
+
+.season-card.special::before { background: var(--eucalyptus-blue); }
+.season-card.special:hover { border-color: var(--eucalyptus-blue); }
+
+/* ============================================
+   Video Section
+   ============================================ */
+.latest-video {
+    margin-bottom: var(--space-xl);
+    text-align: center;
+}
+
+.latest-video h2 {
+    margin-bottom: var(--space-md);
+}
+
+.video-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.video-wrapper {
+    position: relative;
+    padding-bottom: 56.25%; /* 16:9 aspect ratio */
+    height: 0;
+    overflow: hidden;
+}
+
+.video-wrapper iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+.video-info {
+    padding: var(--space-md);
+    text-align: left;
+    background: var(--cream);
+}
+
+.video-info h3 {
+    margin-bottom: var(--space-xs);
+}
+
+.video-date {
+    color: var(--gum-green);
+    font-size: 0.9rem;
+    margin-bottom: var(--space-sm);
+}
+
+.video-description {
+    color: var(--bark-brown);
+}
+
+.view-more {
+    display: inline-block;
+    color: var(--ochre);
+    font-weight: 600;
+    margin-top: var(--space-sm);
+}
+
+.view-more:hover {
+    color: var(--campfire-orange);
+}
+
+/* ============================================
+   Community Section
+   ============================================ */
+.community-section {
+    margin-bottom: var(--space-xl);
+}
+
+.community-section h2 {
+    text-align: center;
+    margin-bottom: var(--space-sm);
+}
+
+.community-section > .gum-border-frame > p {
+    text-align: center;
+    max-width: 700px;
+    margin: 0 auto var(--space-lg);
+}
+
+.community-features {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-md);
+}
+
+.feature {
+    text-align: center;
+    padding: var(--space-sm);
+}
+
+.feature-icon {
+    font-size: 2rem;
+    margin-bottom: var(--space-sm);
+}
+
+.feature h4 {
+    color: var(--gum-green);
+    margin-bottom: var(--space-xs);
+}
+
+.feature p {
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* ============================================
+   Newsletter Section
+   ============================================ */
+.newsletter-section {
+    background: linear-gradient(135deg, var(--gum-green-dark) 0%, var(--gum-green) 100%);
+    padding: var(--space-lg);
+    border-radius: 12px;
+    text-align: center;
+    color: white;
+    margin-bottom: var(--space-lg);
+}
+
+.newsletter-section h2 {
+    color: white;
+    margin-bottom: var(--space-xs);
+}
+
+.newsletter-section p {
+    color: var(--gum-green-pale);
+    margin-bottom: var(--space-md);
+}
+
+.newsletter-form {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-sm);
+    flex-wrap: wrap;
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.newsletter-form input {
+    flex: 1;
+    min-width: 200px;
+    padding: var(--space-sm);
+    border: none;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-family: var(--font-body);
+}
+
+.newsletter-form button {
+    background: var(--ochre);
+    color: white;
+    border: none;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-body);
+}
+
+.newsletter-form button:hover {
+    background: var(--campfire-orange);
+    transform: translateY(-2px);
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+.main-footer {
+    background: var(--gum-green-dark);
+    color: var(--gum-green-pale);
+    padding: var(--space-lg);
+    margin-top: var(--space-xl);
+}
+
+.footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-lg);
+}
+
+.footer-section h4 {
+    color: white;
+    margin-bottom: var(--space-sm);
+    font-family: var(--font-display);
+}
+
+.footer-section p {
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section li {
+    margin-bottom: var(--space-xs);
+}
+
+.footer-section a {
+    color: var(--gum-green-pale);
+    font-size: 0.9rem;
+}
+
+.footer-section a:hover {
+    color: var(--ochre-light);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: var(--space-md);
+    margin-top: var(--space-lg);
+    border-top: 1px solid rgba(255,255,255,0.1);
+}
+
+.footer-bottom p {
+    font-size: 0.85rem;
+    margin-bottom: var(--space-sm);
+}
+
+.gum-leaf-footer-decoration {
+    width: 50px;
+    height: 20px;
+    background: linear-gradient(135deg, var(--gum-green) 0%, var(--gum-green-light) 100%);
+    border-radius: 0 80% 0 80%;
+    margin: 0 auto;
+    transform: rotate(-10deg);
+    opacity: 0.5;
+}
+
+/* ============================================
+   Liturgy Page Specific Styles
+   ============================================ */
+.liturgy-page {
+    padding: var(--space-lg) 0;
+}
+
+.liturgy-header {
+    text-align: center;
+    margin-bottom: var(--space-lg);
+}
+
+.liturgy-header h1 {
+    color: var(--gum-green-dark);
+    margin-bottom: var(--space-sm);
+}
+
+.liturgy-meta {
+    color: var(--gum-green);
+    font-style: italic;
+}
+
+.liturgy-content {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.liturgy-video-section {
+    margin-bottom: var(--space-lg);
+}
+
+.liturgy-text {
+    background: var(--cream);
+    padding: var(--space-lg);
+    border-radius: 12px;
+    border: 2px solid var(--gum-green-light);
+    margin-bottom: var(--space-lg);
+}
+
+.liturgy-text h3 {
+    color: var(--gum-green);
+    margin: var(--space-md) 0 var(--space-sm);
+    border-bottom: 2px solid var(--gum-green-pale);
+    padding-bottom: var(--space-xs);
+}
+
+.liturgy-text h3:first-child {
+    margin-top: 0;
+}
+
+.response {
+    font-weight: 600;
+    color: var(--ochre);
+    margin-left: var(--space-md);
+}
+
+.leader {
+    font-style: italic;
+    color: var(--gum-green-dark);
+}
+
+.instruction {
+    font-size: 0.9rem;
+    color: var(--bark-brown);
+    font-style: italic;
+    background: var(--sand);
+    padding: var(--space-sm);
+    border-radius: 6px;
+    margin: var(--space-sm) 0;
+}
+
+/* ============================================
+   Comments Section
+   ============================================ */
+.comments-section {
+    background: var(--cream);
+    padding: var(--space-lg);
+    border-radius: 12px;
+    border: 3px solid var(--gum-green-light);
+    position: relative;
+}
+
+.comments-section::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    right: 30px;
+    width: 45px;
+    height: 18px;
+    background: linear-gradient(135deg, var(--gum-green) 0%, var(--gum-green-light) 100%);
+    border-radius: 0 70% 0 70%;
+    transform: rotate(15deg);
+}
+
+.comments-section h3 {
+    margin-bottom: var(--space-md);
+    color: var(--gum-green-dark);
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+}
+
+.comment-count {
+    background: var(--gum-green);
+    color: white;
+    font-size: 0.8rem;
+    padding: 2px 10px;
+    border-radius: 20px;
+}
+
+/* Comment Form */
+.comment-form {
+    background: var(--sand);
+    padding: var(--space-md);
+    border-radius: 8px;
+    margin-bottom: var(--space-lg);
+}
+
+.comment-form h4 {
+    margin-bottom: var(--space-sm);
+    color: var(--gum-green);
+}
+
+.form-group {
+    margin-bottom: var(--space-sm);
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: var(--space-xs);
+    font-weight: 600;
+    color: var(--bark-brown);
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: var(--space-sm);
+    border: 2px solid var(--gum-green-pale);
+    border-radius: 6px;
+    font-family: var(--font-body);
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--gum-green);
+}
+
+.form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+.submit-comment {
+    background: var(--gum-green);
+    color: white;
+    border: none;
+    padding: var(--space-sm) var(--space-md);
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: var(--font-body);
+}
+
+.submit-comment:hover {
+    background: var(--gum-green-dark);
+    transform: translateY(-2px);
+}
+
+/* Comments List */
+.comments-list {
+    margin-top: var(--space-md);
+}
+
+.comment {
+    background: white;
+    padding: var(--space-md);
+    border-radius: 8px;
+    margin-bottom: var(--space-sm);
+    border-left: 4px solid var(--gum-green);
+    box-shadow: var(--shadow-soft);
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: var(--space-sm);
+}
+
+.comment-author {
+    font-weight: 600;
+    color: var(--gum-green-dark);
+}
+
+.comment-date {
+    font-size: 0.85rem;
+    color: var(--gum-green);
+}
+
+.comment-body {
+    color: var(--bark-brown);
+    line-height: 1.7;
+}
+
+.comment-reply {
+    margin-top: var(--space-sm);
+}
+
+.reply-btn {
+    background: none;
+    border: none;
+    color: var(--ochre);
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: var(--font-body);
+}
+
+.reply-btn:hover {
+    color: var(--campfire-orange);
+}
+
+.no-comments {
+    text-align: center;
+    color: var(--gum-green);
+    font-style: italic;
+    padding: var(--space-md);
+}
+
+/* ============================================
+   Season Landing Page
+   ============================================ */
+.season-header {
+    text-align: center;
+    padding: var(--space-lg);
+    border-radius: 12px;
+    margin-bottom: var(--space-lg);
+    position: relative;
+    overflow: hidden;
+}
+
+.season-header.advent {
+    background: linear-gradient(135deg, var(--advent-purple) 0%, #8b6a9e 100%);
+    color: white;
+}
+
+.season-header.christmas {
+    background: linear-gradient(135deg, var(--christmas-gold) 0%, #e8d592 100%);
+    color: var(--bark-brown);
+}
+
+.season-header.lent {
+    background: linear-gradient(135deg, var(--lent-purple) 0%, #7a5c7c 100%);
+    color: white;
+}
+
+.season-header.easter {
+    background: linear-gradient(135deg, #f5e6b3 0%, var(--cream) 100%);
+    color: var(--bark-brown);
+}
+
+.season-header.pentecost {
+    background: linear-gradient(135deg, var(--pentecost-red) 0%, #d45a5a 100%);
+    color: white;
+}
+
+.season-header.ordinary {
+    background: linear-gradient(135deg, var(--gum-green) 0%, var(--gum-green-light) 100%);
+    color: white;
+}
+
+.season-header h1 {
+    color: inherit;
+    margin-bottom: var(--space-sm);
+}
+
+.season-description {
+    max-width: 700px;
+    margin: 0 auto;
+    font-size: 1.1rem;
+}
+
+.liturgy-list {
+    display: grid;
+    gap: var(--space-md);
+}
+
+.liturgy-card {
+    display: flex;
+    gap: var(--space-md);
+    background: var(--cream);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-soft);
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+}
+
+.liturgy-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
+    border-color: var(--gum-green-light);
+}
+
+.liturgy-card-thumbnail {
+    width: 200px;
+    min-height: 130px;
+    background: var(--gum-green-pale);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+}
+
+.liturgy-card-content {
+    padding: var(--space-md);
+    flex: 1;
+}
+
+.liturgy-card-content h3 {
+    margin-bottom: var(--space-xs);
+}
+
+.liturgy-card-content h3 a {
+    color: var(--gum-green-dark);
+}
+
+.liturgy-card-content h3 a:hover {
+    color: var(--ochre);
+}
+
+.liturgy-card-date {
+    font-size: 0.85rem;
+    color: var(--gum-green);
+    margin-bottom: var(--space-sm);
+}
+
+.liturgy-card-excerpt {
+    color: var(--bark-brown);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+/* ============================================
+   About & Contact Pages
+   ============================================ */
+.page-content {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.page-content h1 {
+    text-align: center;
+    margin-bottom: var(--space-lg);
+}
+
+.about-image {
+    width: 100%;
+    max-width: 400px;
+    border-radius: 12px;
+    margin: var(--space-md) auto;
+    display: block;
+    box-shadow: var(--shadow-medium);
+}
+
+.contact-form {
+    background: var(--cream);
+    padding: var(--space-lg);
+    border-radius: 12px;
+    border: 3px solid var(--gum-green-light);
+}
+
+/* ============================================
+   Responsive Styles
+   ============================================ */
+@media (max-width: 768px) {
+    .header-content {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .main-nav ul {
+        justify-content: center;
+    }
+
+    .logo-section h1 {
+        font-size: 2rem;
+    }
+
+    h1 { font-size: 2rem; }
+    h2 { font-size: 1.75rem; }
+
+    .gum-leaf-corner {
+        display: none;
+    }
+
+    main {
+        padding: var(--space-md);
+    }
+
+    .gum-border-frame {
+        padding: var(--space-md);
+    }
+
+    .liturgy-card {
+        flex-direction: column;
+    }
+
+    .liturgy-card-thumbnail {
+        width: 100%;
+        min-height: 100px;
+    }
+
+    .newsletter-form {
+        flex-direction: column;
+    }
+
+    .newsletter-form input {
+        width: 100%;
+    }
+
+    .comment-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--space-xs);
+    }
+}
+
+@media (max-width: 480px) {
+    .seasons-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .community-features {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ============================================
+   Animation & Transitions
+   ============================================ */
+@keyframes gentleSway {
+    0%, 100% { transform: rotate(-10deg); }
+    50% { transform: rotate(-5deg); }
+}
+
+.gum-leaf-icon {
+    animation: gentleSway 4s ease-in-out infinite;
+}
+
+/* Fade in on scroll (add class via JS) */
+.fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.6s ease;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ============================================
+   Print Styles
+   ============================================ */
+@media print {
+    .main-header,
+    .main-footer,
+    .comments-section,
+    .newsletter-section,
+    .gum-leaf-corner {
+        display: none;
+    }
+
+    body {
+        color: black;
+        background: white;
+    }
+
+    .liturgy-text {
+        border: 1px solid #ccc;
+    }
+}

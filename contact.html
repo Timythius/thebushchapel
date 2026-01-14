@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect - The Bush Chapel</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="gum-leaf-corner top-left"></div>
+    <div class="gum-leaf-corner top-right"></div>
+
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-section">
+                <div class="gum-leaf-icon"></div>
+                <h1>The Bush Chapel</h1>
+                <p class="tagline">Liturgies from the Australian Bush</p>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="liturgies.html">All Liturgies</a></li>
+                    <li><a href="contact.html" class="active">Connect</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <article class="page-content">
+            <h1>Connect With Us</h1>
+
+            <section class="gum-border-frame">
+                <h2 style="text-align: center; margin-bottom: 1.5rem;">Pull Up a Chair</h2>
+
+                <p style="text-align: center; max-width: 600px; margin: 0 auto 2rem;">
+                    The Bush Chapel is about connection—with God, with each other, with this land.
+                    We'd love to hear from you. Whether you have a question, a prayer request,
+                    feedback on a liturgy, or just want to say g'day, you're welcome here.
+                </p>
+
+                <div class="contact-form">
+                    <form id="contact-form">
+                        <div class="form-group">
+                            <label for="contact-name">Your Name</label>
+                            <input type="text" id="contact-name" name="name" required placeholder="What should we call you?">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact-email">Your Email</label>
+                            <input type="email" id="contact-email" name="email" required placeholder="your.email@example.com">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact-subject">Subject</label>
+                            <select id="contact-subject" name="subject" style="width: 100%; padding: 1rem; border: 2px solid var(--gum-green-pale); border-radius: 6px; font-family: var(--font-body); font-size: 1rem;">
+                                <option value="general">General Enquiry</option>
+                                <option value="prayer">Prayer Request</option>
+                                <option value="feedback">Liturgy Feedback</option>
+                                <option value="request">Request a Liturgy Topic</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="contact-message">Your Message</label>
+                            <textarea id="contact-message" name="message" required placeholder="What's on your heart?" style="min-height: 150px;"></textarea>
+                        </div>
+
+                        <button type="submit" class="submit-comment" style="width: 100%;">Send Message</button>
+                    </form>
+                </div>
+            </section>
+
+            <section style="margin-top: 3rem;">
+                <h2 style="text-align: center; margin-bottom: 2rem;">Other Ways to Connect</h2>
+
+                <div class="community-features">
+                    <div class="feature">
+                        <div class="feature-icon">📺</div>
+                        <h4>YouTube</h4>
+                        <p>Subscribe to our channel for weekly liturgy videos, reflections, and more.</p>
+                        <a href="https://youtube.com/@Thebushchapel" style="color: var(--ochre);">Visit Channel →</a>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-icon">📧</div>
+                        <h4>Newsletter</h4>
+                        <p>Receive new liturgies and reflections straight to your inbox.</p>
+                        <a href="index.html#newsletter" style="color: var(--ochre);">Subscribe →</a>
+                    </div>
+
+                    <div class="feature">
+                        <div class="feature-icon">💬</div>
+                        <h4>Comments</h4>
+                        <p>Join the conversation under each liturgy video on our website.</p>
+                        <a href="liturgies.html" style="color: var(--ochre);">Browse Liturgies →</a>
+                    </div>
+                </div>
+            </section>
+
+            <section class="gum-border-frame" style="margin-top: 3rem; text-align: center;">
+                <h3>Prayer Requests</h3>
+                <p style="max-width: 500px; margin: 0 auto;">
+                    If you'd like us to pray for you, please don't hesitate to reach out.
+                    Your requests will be held in confidence and lifted up in prayer.
+                    You don't have to walk alone.
+                </p>
+            </section>
+        </article>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>The Bush Chapel</h4>
+                <p>An online space for worship, reflection, and community in the Australian tradition.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Seasons</h4>
+                <ul>
+                    <li><a href="seasons/advent.html">Advent</a></li>
+                    <li><a href="seasons/christmas.html">Christmas</a></li>
+                    <li><a href="seasons/lent.html">Lent</a></li>
+                    <li><a href="seasons/easter.html">Easter</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Connect</h4>
+                <ul>
+                    <li><a href="https://youtube.com/@Thebushchapel">YouTube</a></li>
+                    <li><a href="about.html">About</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2024 The Bush Chapel. All liturgies shared with love for the church.</p>
+        </div>
+    </footer>
+
+    <div class="gum-leaf-corner bottom-left"></div>
+    <div class="gum-leaf-corner bottom-right"></div>
+
+    <script src="script.js"></script>
+    <script>
+        // Contact form handling
+        document.getElementById('contact-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            // Here you would typically send to a backend
+            // For now, show a success message
+            showNotification('Thank you for your message! We\'ll be in touch soon.');
+            this.reset();
+        });
+    </script>
+</body>
+</html>
