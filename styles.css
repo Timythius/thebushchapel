@@ -102,163 +102,26 @@ img {
     height: auto;
 }
 
-/* ============================================
-   Gum Leaf Decorative Elements
-   ============================================ */
+/* CSS-generated gum leaf decorations removed */
 
-/* Corner gum leaf decorations using CSS shapes and gradients */
-.gum-leaf-corner {
-    position: fixed;
-    width: 200px;
-    height: 200px;
-    pointer-events: none;
-    z-index: 100;
-    opacity: 0.6;
-}
-
-.gum-leaf-corner::before,
-.gum-leaf-corner::after {
-    content: '';
-    position: absolute;
-    background: linear-gradient(135deg, var(--gum-green) 0%, var(--gum-green-light) 50%, var(--gum-green-pale) 100%);
-    border-radius: 0 80% 0 80%;
-}
-
-.top-left {
-    top: -20px;
-    left: -20px;
-}
-
-.top-left::before {
-    width: 80px;
-    height: 30px;
-    transform: rotate(-45deg);
-    top: 40px;
-    left: 20px;
-}
-
-.top-left::after {
-    width: 60px;
-    height: 24px;
-    transform: rotate(-25deg);
-    top: 60px;
-    left: 60px;
-}
-
-.top-right {
-    top: -20px;
-    right: -20px;
-}
-
-.top-right::before {
-    width: 80px;
-    height: 30px;
-    transform: rotate(45deg);
-    top: 40px;
-    right: 20px;
-}
-
-.top-right::after {
-    width: 60px;
-    height: 24px;
-    transform: rotate(25deg);
-    top: 60px;
-    right: 60px;
-}
-
-.bottom-left {
-    bottom: -20px;
-    left: -20px;
-}
-
-.bottom-left::before {
-    width: 80px;
-    height: 30px;
-    transform: rotate(45deg);
-    bottom: 40px;
-    left: 20px;
-}
-
-.bottom-right {
-    bottom: -20px;
-    right: -20px;
-}
-
-.bottom-right::before {
-    width: 80px;
-    height: 30px;
-    transform: rotate(-45deg);
-    bottom: 40px;
-    right: 20px;
-}
-
-/* Gum leaf border frame for content sections */
+/* Simple border frame for content sections */
 .gum-border-frame {
     position: relative;
     background: var(--cream);
-    border: 3px solid var(--gum-green-light);
+    border: 1px solid var(--ochre-light);
     border-radius: 8px;
     padding: var(--space-lg);
     box-shadow: var(--shadow-soft);
 }
 
-.gum-border-frame::before {
-    content: '';
-    position: absolute;
-    top: -12px;
-    left: 30px;
-    width: 50px;
-    height: 20px;
-    background: linear-gradient(135deg, var(--gum-green) 0%, var(--gum-green-light) 100%);
-    border-radius: 0 70% 0 70%;
-    transform: rotate(-15deg);
-}
-
-.gum-border-frame::after {
-    content: '';
-    position: absolute;
-    top: -8px;
-    left: 70px;
-    width: 40px;
-    height: 16px;
-    background: linear-gradient(135deg, var(--gum-green-light) 0%, var(--gum-green-pale) 100%);
-    border-radius: 0 70% 0 70%;
-    transform: rotate(10deg);
-}
-
-/* Gum leaf video border */
+/* Simple video border */
 .gum-leaf-video-border {
     position: relative;
     background: var(--cream);
-    border: 4px solid var(--gum-green);
+    border: 1px solid var(--ochre-light);
     border-radius: 12px;
     overflow: hidden;
     box-shadow: var(--shadow-medium);
-}
-
-.gum-leaf-video-border::before,
-.gum-leaf-video-border::after {
-    content: '';
-    position: absolute;
-    background: linear-gradient(45deg, var(--gum-green) 0%, var(--gum-green-light) 100%);
-    border-radius: 0 80% 0 80%;
-    z-index: 10;
-}
-
-.gum-leaf-video-border::before {
-    width: 70px;
-    height: 25px;
-    top: -5px;
-    left: 20px;
-    transform: rotate(-20deg);
-}
-
-.gum-leaf-video-border::after {
-    width: 55px;
-    height: 20px;
-    top: -3px;
-    right: 40px;
-    transform: rotate(15deg);
 }
 
 /* ============================================
@@ -270,21 +133,7 @@ img {
     position: relative;
 }
 
-.main-header::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 8px;
-    background: repeating-linear-gradient(
-        90deg,
-        var(--gum-green-light) 0px,
-        var(--gum-green-light) 20px,
-        var(--gum-green-pale) 20px,
-        var(--gum-green-pale) 40px
-    );
-}
+/* Header decorative bar removed */
 
 .header-content {
     max-width: 1200px;
@@ -315,14 +164,7 @@ img {
     margin: 0;
 }
 
-.gum-leaf-icon {
-    width: 40px;
-    height: 20px;
-    background: linear-gradient(135deg, var(--gum-green-pale) 0%, var(--ochre-light) 100%);
-    border-radius: 0 80% 0 80%;
-    margin: 0 auto var(--space-xs);
-    transform: rotate(-10deg);
-}
+/* gum-leaf-icon removed */
 
 .main-nav ul {
     list-style: none;
@@ -709,15 +551,7 @@ main {
     margin-bottom: var(--space-sm);
 }
 
-.gum-leaf-footer-decoration {
-    width: 50px;
-    height: 20px;
-    background: linear-gradient(135deg, var(--gum-green) 0%, var(--gum-green-light) 100%);
-    border-radius: 0 80% 0 80%;
-    margin: 0 auto;
-    transform: rotate(-10deg);
-    opacity: 0.5;
-}
+/* gum-leaf-footer-decoration removed */
 
 /* ============================================
    Liturgy Page Specific Styles
@@ -754,14 +588,14 @@ main {
     background: var(--cream);
     padding: var(--space-lg);
     border-radius: 12px;
-    border: 2px solid var(--gum-green-light);
+    border: 1px solid var(--ochre-light);
     margin-bottom: var(--space-lg);
 }
 
 .liturgy-text h3 {
     color: var(--gum-green);
     margin: var(--space-md) 0 var(--space-sm);
-    border-bottom: 2px solid var(--gum-green-pale);
+    border-bottom: 1px solid var(--ochre-light);
     padding-bottom: var(--space-xs);
 }
 
@@ -797,21 +631,11 @@ main {
     background: var(--cream);
     padding: var(--space-lg);
     border-radius: 12px;
-    border: 3px solid var(--gum-green-light);
+    border: 1px solid var(--ochre-light);
     position: relative;
 }
 
-.comments-section::before {
-    content: '';
-    position: absolute;
-    top: -10px;
-    right: 30px;
-    width: 45px;
-    height: 18px;
-    background: linear-gradient(135deg, var(--gum-green) 0%, var(--gum-green-light) 100%);
-    border-radius: 0 70% 0 70%;
-    transform: rotate(15deg);
-}
+/* Comments section leaf decoration removed */
 
 .comments-section h3 {
     margin-bottom: var(--space-md);
@@ -857,7 +681,7 @@ main {
 .form-group textarea {
     width: 100%;
     padding: var(--space-sm);
-    border: 2px solid var(--gum-green-pale);
+    border: 1px solid var(--ochre-light);
     border-radius: 6px;
     font-family: var(--font-body);
     font-size: 1rem;
@@ -867,7 +691,7 @@ main {
 .form-group input:focus,
 .form-group textarea:focus {
     outline: none;
-    border-color: var(--gum-green);
+    border-color: var(--ochre);
 }
 
 .form-group textarea {
@@ -902,7 +726,7 @@ main {
     padding: var(--space-md);
     border-radius: 8px;
     margin-bottom: var(--space-sm);
-    border-left: 4px solid var(--gum-green);
+    border-left: 4px solid var(--ochre);
     box-shadow: var(--shadow-soft);
 }
 
@@ -1025,7 +849,7 @@ main {
 .liturgy-card:hover {
     transform: translateY(-3px);
     box-shadow: var(--shadow-medium);
-    border-color: var(--gum-green-light);
+    border-color: var(--ochre-light);
 }
 
 .liturgy-card-thumbnail {
@@ -1093,7 +917,7 @@ main {
     background: var(--cream);
     padding: var(--space-lg);
     border-radius: 12px;
-    border: 3px solid var(--gum-green-light);
+    border: 1px solid var(--ochre-light);
 }
 
 /* ============================================
@@ -1115,10 +939,6 @@ main {
 
     h1 { font-size: 2rem; }
     h2 { font-size: 1.75rem; }
-
-    .gum-leaf-corner {
-        display: none;
-    }
 
     main {
         padding: var(--space-md);
@@ -1170,9 +990,7 @@ main {
     50% { transform: rotate(-5deg); }
 }
 
-.gum-leaf-icon {
-    animation: gentleSway 4s ease-in-out infinite;
-}
+/* gum-leaf-icon animation removed */
 
 /* Fade in on scroll (add class via JS) */
 .fade-in {
@@ -1187,14 +1005,416 @@ main {
 }
 
 /* ============================================
+   Botanical Image Decorations
+   ============================================ */
+
+/* Base styles for all botanical decorations */
+.botanical-decoration {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+    opacity: 0.85;
+    transition: opacity 0.3s ease;
+}
+
+.botanical-decoration img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Fixed corner botanicals that stay in viewport */
+.botanical-corner {
+    position: fixed;
+    pointer-events: none;
+    z-index: 50;
+    opacity: 0.7;
+}
+
+.botanical-corner.top-left {
+    top: 80px;
+    left: -30px;
+}
+
+.botanical-corner.top-right {
+    top: 80px;
+    right: -30px;
+}
+
+.botanical-corner.bottom-left {
+    bottom: 20px;
+    left: -30px;
+}
+
+.botanical-corner.bottom-right {
+    bottom: 20px;
+    right: -30px;
+}
+
+.botanical-corner img {
+    width: 120px;
+    height: auto;
+    filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.1));
+}
+
+/* Flip images for right side */
+.botanical-corner.top-right img,
+.botanical-corner.bottom-right img {
+    transform: scaleX(-1);
+}
+
+/* Section botanical decorations */
+.section-botanical {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.section-botanical.left {
+    left: -60px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.section-botanical.right {
+    right: -60px;
+    top: 50%;
+    transform: translateY(-50%) scaleX(-1);
+}
+
+.section-botanical img {
+    width: 100px;
+    height: auto;
+    opacity: 0.6;
+}
+
+/* Header botanical accent */
+.header-botanical {
+    position: absolute;
+    pointer-events: none;
+    z-index: 10;
+}
+
+.header-botanical.left {
+    left: 20px;
+    bottom: -30px;
+}
+
+.header-botanical.right {
+    right: 20px;
+    bottom: -30px;
+    transform: scaleX(-1);
+}
+
+.header-botanical img {
+    width: 80px;
+    height: auto;
+    opacity: 0.9;
+    filter: drop-shadow(1px 2px 4px rgba(0,0,0,0.15));
+}
+
+/* Welcome section botanicals */
+.welcome-section {
+    position: relative;
+}
+
+.welcome-botanical {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.welcome-botanical.left {
+    left: -20px;
+    top: 20%;
+}
+
+.welcome-botanical.right {
+    right: -20px;
+    bottom: 20%;
+    transform: scaleX(-1);
+}
+
+.welcome-botanical img {
+    width: 140px;
+    height: auto;
+    opacity: 0.5;
+}
+
+/* Footer botanical decorations */
+.footer-botanical {
+    position: absolute;
+    pointer-events: none;
+}
+
+.footer-botanical.left {
+    left: 40px;
+    top: -40px;
+}
+
+.footer-botanical.right {
+    right: 40px;
+    top: -40px;
+    transform: scaleX(-1);
+}
+
+.footer-botanical img {
+    width: 90px;
+    height: auto;
+    opacity: 0.6;
+}
+
+/* Inline botanical dividers between sections */
+.botanical-divider {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: var(--space-md) 0;
+    gap: var(--space-lg);
+    opacity: 0.7;
+}
+
+.botanical-divider img {
+    width: 60px;
+    height: auto;
+}
+
+.botanical-divider img:nth-child(2) {
+    width: 80px;
+}
+
+.botanical-divider img:first-child {
+    transform: scaleX(-1);
+}
+
+/* Candle decoration for liturgy sections */
+.candle-decoration {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.candle-decoration img {
+    width: 70px;
+    height: auto;
+    opacity: 0.75;
+}
+
+/* Season page botanical accents */
+.season-botanical {
+    position: absolute;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.season-botanical.corner-left {
+    left: 20px;
+    top: 20px;
+}
+
+.season-botanical.corner-right {
+    right: 20px;
+    top: 20px;
+    transform: scaleX(-1);
+}
+
+.season-botanical img {
+    width: 90px;
+    height: auto;
+    opacity: 0.8;
+}
+
+/* Community section positioned botanicals */
+.community-section {
+    position: relative;
+}
+
+.community-section .gum-border-frame {
+    position: relative;
+    overflow: visible;
+}
+
+/* Newsletter botanical accent */
+.newsletter-section {
+    position: relative;
+    overflow: visible;
+}
+
+.newsletter-botanical {
+    position: absolute;
+    pointer-events: none;
+}
+
+.newsletter-botanical.left {
+    left: -50px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.newsletter-botanical.right {
+    right: -50px;
+    top: 50%;
+    transform: translateY(-50%) scaleX(-1);
+}
+
+.newsletter-botanical img {
+    width: 100px;
+    height: auto;
+    opacity: 0.8;
+}
+
+/* Video section botanical frame */
+.video-botanical {
+    position: absolute;
+    pointer-events: none;
+    z-index: 5;
+}
+
+.video-botanical.top-left {
+    left: -30px;
+    top: -30px;
+}
+
+.video-botanical.bottom-right {
+    right: -30px;
+    bottom: -30px;
+    transform: rotate(180deg);
+}
+
+.video-botanical img {
+    width: 80px;
+    height: auto;
+    opacity: 0.7;
+}
+
+/* Liturgical calendar botanical accents */
+.liturgical-calendar {
+    position: relative;
+}
+
+.calendar-botanical {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.calendar-botanical.left {
+    left: -80px;
+    top: 100px;
+}
+
+.calendar-botanical.right {
+    right: -80px;
+    bottom: 100px;
+    transform: scaleX(-1);
+}
+
+.calendar-botanical img {
+    width: 120px;
+    height: auto;
+    opacity: 0.4;
+}
+
+/* Page content botanical decorations */
+.page-botanical {
+    position: absolute;
+    pointer-events: none;
+}
+
+.page-botanical.top-right {
+    right: 0;
+    top: 0;
+}
+
+.page-botanical.bottom-left {
+    left: 0;
+    bottom: 0;
+    transform: rotate(180deg);
+}
+
+.page-botanical img {
+    width: 130px;
+    height: auto;
+    opacity: 0.5;
+}
+
+/* Make relative container for main header */
+.main-header {
+    position: relative;
+    overflow: visible;
+}
+
+/* Make footer relative for botanical positioning */
+.main-footer {
+    position: relative;
+    overflow: visible;
+}
+
+/* Responsive botanical adjustments */
+@media (max-width: 1200px) {
+    .botanical-corner img {
+        width: 90px;
+    }
+
+    .welcome-botanical img,
+    .calendar-botanical img {
+        width: 100px;
+    }
+
+    .section-botanical {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .botanical-corner {
+        display: none;
+    }
+
+    .welcome-botanical,
+    .calendar-botanical,
+    .newsletter-botanical,
+    .video-botanical,
+    .page-botanical {
+        display: none;
+    }
+
+    .botanical-divider img {
+        width: 40px;
+    }
+
+    .botanical-divider img:nth-child(2) {
+        width: 50px;
+    }
+
+    .header-botanical img {
+        width: 50px;
+    }
+
+    .footer-botanical img {
+        width: 60px;
+    }
+}
+
+@media (max-width: 480px) {
+    .botanical-divider {
+        gap: var(--space-sm);
+    }
+
+    .header-botanical,
+    .footer-botanical {
+        display: none;
+    }
+}
+
+/* ============================================
    Print Styles
    ============================================ */
 @media print {
     .main-header,
     .main-footer,
     .comments-section,
-    .newsletter-section,
-    .gum-leaf-corner {
+    .newsletter-section {
         display: none;
     }
 
