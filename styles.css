@@ -869,22 +869,6 @@ main {
     z-index: 10;
 }
 
-@media (max-width: 768px) {
-    .season-header-image {
-        position: relative;
-        top: auto;
-        left: auto;
-        transform: none;
-        width: 150px;
-        margin: 0 auto var(--space-sm);
-        display: block;
-    }
-
-    .season-header h1 {
-        padding-top: 0;
-    }
-}
-
 .season-header h1 {
     position: relative;
     color: inherit;
@@ -897,6 +881,75 @@ main {
     max-width: 700px;
     margin: 0 auto;
     font-size: 1.1rem;
+}
+
+@media (max-width: 768px) {
+    .season-header-image {
+        position: relative;
+        top: -25px;
+        left: auto;
+        transform: none;
+        width: 240px;
+        height: 240px;
+        object-fit: contain;
+        margin: 0 auto -55px;
+        padding: 15px;
+        background: transparent !important;
+        border-radius: 16px;
+        box-shadow: none;
+        z-index: 5;
+    }
+
+    .season-header.christmas .season-header-image {
+        top: -5px;
+        margin-bottom: -35px;
+    }
+
+    .season-header {
+        min-height: auto;
+        padding: var(--space-sm);
+        padding-top: 40px;
+        border-radius: 16px;
+    }
+
+    .season-header h1 {
+        padding-top: 0;
+        font-size: 1.4rem;
+    }
+
+    .season-description {
+        font-size: 0.9rem;
+    }
+
+    .season-header.advent .season-header-image,
+    .season-header.advent {
+        background: var(--advent-purple);
+    }
+
+    .season-header.christmas .season-header-image,
+    .season-header.christmas {
+        background: var(--christmas-gold);
+    }
+
+    .season-header.lent .season-header-image,
+    .season-header.lent {
+        background: var(--lent-purple);
+    }
+
+    .season-header.easter .season-header-image,
+    .season-header.easter {
+        background: #f5e6b3;
+    }
+
+    .season-header.pentecost .season-header-image,
+    .season-header.pentecost {
+        background: var(--pentecost-red);
+    }
+
+    .season-header.ordinary .season-header-image,
+    .season-header.ordinary {
+        background: var(--gum-green);
+    }
 }
 
 /* Blog Post Styles */
