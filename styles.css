@@ -903,6 +903,7 @@ main {
     .season-header.christmas .season-header-image {
         top: -5px;
         margin-bottom: -35px;
+        margin-left: calc(50% - 113px);
     }
 
     .season-header.pentecost .season-header-image {
