@@ -211,6 +211,12 @@ main {
     box-shadow: var(--shadow-medium);
 }
 
+@media (max-width: 768px) {
+    .hero-banner {
+        display: none;
+    }
+}
+
 /* Welcome Section */
 .welcome-section {
     margin-bottom: var(--space-xl);
@@ -861,6 +867,22 @@ main {
     width: 240px;
     height: auto;
     z-index: 10;
+}
+
+@media (max-width: 768px) {
+    .season-header-image {
+        position: relative;
+        top: auto;
+        left: auto;
+        transform: none;
+        width: 150px;
+        margin: 0 auto var(--space-sm);
+        display: block;
+    }
+
+    .season-header h1 {
+        padding-top: 0;
+    }
 }
 
 .season-header h1 {
@@ -1523,6 +1545,11 @@ main {
     }
 }
 
+/* Mobile botanical decorations - hidden by default */
+.mobile-botanical {
+    display: none;
+}
+
 @media (max-width: 768px) {
     .botanical-corner {
         display: none;
@@ -1550,6 +1577,31 @@ main {
 
     .footer-botanical img {
         width: 60px;
+    }
+
+    /* Show mobile botanicals on mobile */
+    .mobile-botanical {
+        display: block;
+        position: absolute;
+        z-index: 5;
+        opacity: 0.6;
+    }
+
+    .mobile-botanical.left {
+        top: 50%;
+        left: 10px;
+        transform: translateY(-50%) rotate(-15deg);
+    }
+
+    .mobile-botanical.right {
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%) rotate(15deg) scaleX(-1);
+    }
+
+    .mobile-botanical img {
+        width: 60px;
+        height: auto;
     }
 }
 
