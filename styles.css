@@ -862,6 +862,110 @@ main {
     font-size: 1.1rem;
 }
 
+/* Blog Post Styles */
+.blog-post {
+    max-width: 800px;
+    margin: var(--space-lg) auto;
+    padding: 0 var(--space-md);
+}
+
+.blog-post-header {
+    text-align: center;
+    margin-bottom: var(--space-lg);
+}
+
+.blog-post-header h2 {
+    font-family: var(--font-display);
+    font-size: 2.2rem;
+    color: var(--gum-green-dark);
+    margin-bottom: var(--space-xs);
+}
+
+.blog-post-header .subtitle {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.4rem;
+    color: var(--lent-purple);
+    margin-bottom: var(--space-sm);
+}
+
+.blog-post-intro {
+    font-size: 1.15rem;
+    text-align: center;
+    color: var(--bark-brown);
+    margin-bottom: var(--space-lg);
+}
+
+.blog-post-content {
+    line-height: 1.8;
+}
+
+.blog-post-content p {
+    margin-bottom: var(--space-md);
+}
+
+.blog-post blockquote {
+    font-family: var(--font-display);
+    font-style: italic;
+    font-size: 1.2rem;
+    color: var(--gum-green-dark);
+    border-left: 4px solid var(--lent-purple);
+    padding-left: var(--space-md);
+    margin: var(--space-lg) 0;
+}
+
+.blog-post blockquote footer {
+    font-size: 1rem;
+    color: var(--ochre);
+    margin-top: var(--space-sm);
+}
+
+.blog-post-section {
+    background: var(--cream);
+    border-radius: 12px;
+    padding: var(--space-md);
+    margin: var(--space-lg) 0;
+    box-shadow: var(--shadow-soft);
+}
+
+.blog-post-section h3 {
+    font-family: var(--font-display);
+    color: var(--lent-purple);
+    margin-bottom: var(--space-sm);
+}
+
+.blog-post-section h4 {
+    font-family: var(--font-display);
+    color: var(--gum-green-dark);
+    margin-top: var(--space-md);
+    margin-bottom: var(--space-xs);
+}
+
+.scripture-reference {
+    font-weight: 600;
+    color: var(--ochre);
+    margin-bottom: var(--space-xs);
+}
+
+.prayer-box {
+    background: linear-gradient(135deg, var(--lent-purple) 0%, #7a5c7c 100%);
+    color: white;
+    border-radius: 12px;
+    padding: var(--space-sm) var(--space-md);
+    padding-top: 4%;
+    margin: var(--space-lg) 0;
+    text-align: left;
+}
+
+.prayer-box h3 {
+    color: white;
+    margin-bottom: var(--space-sm);
+}
+
+.prayer-box p {
+    line-height: 1.8;
+}
+
 .liturgy-list {
     display: grid;
     gap: var(--space-md);
