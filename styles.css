@@ -196,6 +196,21 @@ main {
     padding: var(--space-lg);
 }
 
+/* Hero Banner */
+.hero-banner {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto var(--space-lg);
+    padding: 0 var(--space-md);
+}
+
+.hero-banner img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: var(--shadow-medium);
+}
+
 /* Welcome Section */
 .welcome-section {
     margin-bottom: var(--space-xl);
