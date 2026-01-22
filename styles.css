@@ -259,20 +259,42 @@ main {
 
 .seasons-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(3, 1fr);
     gap: var(--space-md);
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 .season-card {
     background: var(--cream);
     border-radius: 12px;
-    padding: var(--space-md);
     text-align: center;
     box-shadow: var(--shadow-soft);
     transition: all 0.3s ease;
     border: 3px solid transparent;
     position: relative;
     overflow: hidden;
+    aspect-ratio: 4 / 3;
+}
+
+.season-card img {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 70%;
+    max-width: 120px;
+    height: auto;
+    object-fit: contain;
+}
+
+.season-card h3 {
+    position: absolute;
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0;
+    width: 100%;
 }
 
 .season-card::before {
@@ -287,10 +309,6 @@ main {
 .season-card:hover {
     transform: translateY(-5px);
     box-shadow: var(--shadow-medium);
-}
-
-.season-card h3 {
-    margin: var(--space-sm) 0 var(--space-xs);
 }
 
 .season-card p {
@@ -782,11 +800,12 @@ main {
    ============================================ */
 .season-header {
     text-align: center;
-    padding: var(--space-lg);
+    padding: var(--space-md);
     border-radius: 12px;
     margin-bottom: var(--space-lg);
     position: relative;
-    overflow: hidden;
+    overflow: visible;
+    min-height: 267px;
 }
 
 .season-header.advent {
@@ -819,12 +838,25 @@ main {
     color: white;
 }
 
+.season-header-image {
+    position: absolute;
+    top: 33%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 240px;
+    height: auto;
+    z-index: 10;
+}
+
 .season-header h1 {
+    position: relative;
     color: inherit;
     margin-bottom: var(--space-sm);
+    padding-top: 160px;
 }
 
 .season-description {
+    position: relative;
     max-width: 700px;
     margin: 0 auto;
     font-size: 1.1rem;
@@ -969,6 +1001,12 @@ main {
         flex-direction: column;
         align-items: flex-start;
         gap: var(--space-xs);
+    }
+}
+
+@media (max-width: 768px) {
+    .seasons-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
