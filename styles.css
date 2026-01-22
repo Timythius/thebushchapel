@@ -905,6 +905,11 @@ main {
         margin-bottom: -35px;
     }
 
+    .season-header.pentecost .season-header-image {
+        top: -10px;
+        margin-bottom: -40px;
+    }
+
     .season-header {
         min-height: auto;
         padding: var(--space-sm);
