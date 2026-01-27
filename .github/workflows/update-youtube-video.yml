@@ -1,0 +1,159 @@
+name: Update Latest YouTube Video
+
+on:
+  schedule:
+    # Run every 6 hours
+    - cron: '0 */6 * * *'
+  workflow_dispatch:  # Allow manual triggering for testing
+
+permissions:
+  contents: write
+
+jobs:
+  update-video:
+    runs-on: ubuntu-latest
+
+    # Skip if the last commit was from the bot to prevent loops
+    if: github.event.head_commit.author.name != 'bush-chapel-bot'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install yt-dlp
+        run: |
+          pip install yt-dlp
+
+      - name: Resolve YouTube channel ID
+        id: resolve_channel
+        run: |
+          # Resolve @Thebushchapel handle to channel ID
+          CHANNEL_ID=$(yt-dlp --print channel_id "https://www.youtube.com/@Thebushchapel" 2>/dev/null || echo "")
+
+          if [ -z "$CHANNEL_ID" ]; then
+            echo "Error: Failed to resolve channel ID"
+            exit 1
+          fi
+
+          echo "channel_id=$CHANNEL_ID" >> $GITHUB_OUTPUT
+          echo "Resolved channel ID: $CHANNEL_ID"
+
+      - name: Fetch latest video from RSS feed
+        id: fetch_video
+        run: |
+          CHANNEL_ID="${{ steps.resolve_channel.outputs.channel_id }}"
+          RSS_URL="https://www.youtube.com/feeds/videos.xml?channel_id=$CHANNEL_ID"
+
+          # Fetch RSS feed with retries
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            RSS_CONTENT=$(curl -sSL --max-time 30 "$RSS_URL" 2>/dev/null || echo "")
+
+            if [ -n "$RSS_CONTENT" ]; then
+              break
+            fi
+
+            RETRY_COUNT=$((RETRY_COUNT + 1))
+            echo "Retry $RETRY_COUNT/$MAX_RETRIES..."
+            sleep $((RETRY_COUNT * 2))  # Exponential backoff
+          done
+
+          if [ -z "$RSS_CONTENT" ]; then
+            echo "Error: Failed to fetch RSS feed after $MAX_RETRIES retries"
+            exit 1
+          fi
+
+          # Extract latest video ID from XML
+          LATEST_VIDEO_ID=$(echo "$RSS_CONTENT" | grep -oP '<yt:videoId>\K[^<]+' | head -n 1)
+
+          if [ -z "$LATEST_VIDEO_ID" ]; then
+            echo "Error: Failed to extract video ID from RSS feed"
+            exit 1
+          fi
+
+          # Validate video ID format (11 chars, alphanumeric + - and _)
+          if ! echo "$LATEST_VIDEO_ID" | grep -qE '^[A-Za-z0-9_-]{11}$'; then
+            echo "Error: Invalid video ID format: $LATEST_VIDEO_ID"
+            exit 1
+          fi
+
+          echo "video_id=$LATEST_VIDEO_ID" >> $GITHUB_OUTPUT
+          echo "Latest video ID: $LATEST_VIDEO_ID"
+
+          # Extract video title for commit message
+          VIDEO_TITLE=$(echo "$RSS_CONTENT" | grep -oP '<title>\K[^<]+' | sed -n '2p' | sed 's/&amp;/\&/g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/"/g; s/&#39;/'\''/g')
+
+          # Escape single quotes for shell
+          VIDEO_TITLE=$(echo "$VIDEO_TITLE" | sed "s/'/'\"'\"'/g")
+
+          echo "video_title=$VIDEO_TITLE" >> $GITHUB_OUTPUT
+          echo "Video title: $VIDEO_TITLE"
+
+      - name: Check current video ID
+        id: check_current
+        run: |
+          CURRENT_VIDEO_ID=$(grep -oP 'youtube\.com/embed/\K[^"]+' index.html | head -n 1)
+          echo "current_id=$CURRENT_VIDEO_ID" >> $GITHUB_OUTPUT
+          echo "Current video ID: $CURRENT_VIDEO_ID"
+
+      - name: Update video embed
+        id: update_embed
+        run: |
+          CURRENT_ID="${{ steps.check_current.outputs.current_id }}"
+          LATEST_ID="${{ steps.fetch_video.outputs.video_id }}"
+
+          if [ "$CURRENT_ID" = "$LATEST_ID" ]; then
+            echo "Video is already up to date"
+            echo "updated=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "Updating video from $CURRENT_ID to $LATEST_ID"
+
+          # Replace video ID in index.html
+          sed -i "s|youtube\.com/embed/${CURRENT_ID}|youtube.com/embed/${LATEST_ID}|g" index.html
+
+          # Verify the update was successful
+          NEW_ID=$(grep -oP 'youtube\.com/embed/\K[^"]+' index.html | head -n 1)
+
+          if [ "$NEW_ID" != "$LATEST_ID" ]; then
+            echo "Error: Failed to update video ID"
+            exit 1
+          fi
+
+          echo "updated=true" >> $GITHUB_OUTPUT
+          echo "Successfully updated video embed"
+
+      - name: Commit and push changes
+        if: steps.update_embed.outputs.updated == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "bush-chapel-bot"
+
+          VIDEO_TITLE="${{ steps.fetch_video.outputs.video_title }}"
+
+          git add index.html
+          git commit -m "[skip ci] Update latest video: $VIDEO_TITLE"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ "${{ steps.update_embed.outputs.updated }}" = "true" ]; then
+            echo "✅ Video embed updated successfully"
+            echo "New video: ${{ steps.fetch_video.outputs.video_title }}"
+            echo "Video ID: ${{ steps.fetch_video.outputs.video_id }}"
+          else
+            echo "ℹ️ No update needed - video is already current"
+          fi
