@@ -510,10 +510,11 @@ const liturgicalCalendar = {
 
     getSeasonOrder() {
         const currentSeason = this.getCurrentSeason();
-        const seasons = ['advent', 'christmas', 'lent', 'easter', 'pentecost', 'ordinary-time'];
+        // Proper liturgical calendar order (with Ordinary Time appearing where Epiphany would be)
+        const seasons = ['advent', 'christmas', 'ordinary-time', 'lent', 'easter', 'pentecost'];
         const currentIndex = seasons.indexOf(currentSeason);
 
-        // Rotate array to start with current season
+        // Rotate array to start with current season, then flow in calendar order
         return [...seasons.slice(currentIndex), ...seasons.slice(0, currentIndex)];
     }
 };
