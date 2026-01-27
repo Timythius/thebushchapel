@@ -464,68 +464,90 @@ const liturgicalCalendar = {
     getCurrentSeason() {
         const now = new Date();
         const year = now.getFullYear();
+        const month = now.getMonth(); // 0-11
         const yearData = this.years[year];
 
         console.log('=== SEASON DETECTION DEBUG ===');
         console.log('Current date:', now.toISOString());
-        console.log('Current year:', year);
+        console.log('Current year:', year, 'Month:', month);
 
         if (!yearData) return 'ordinary-time';
 
+        // Get Easter and calculate related dates for THIS YEAR
         const easter = new Date(yearData.easter);
         const ashWednesday = new Date(easter);
         ashWednesday.setDate(easter.getDate() - 46);
 
         const pentecost = new Date(easter);
         pentecost.setDate(easter.getDate() + 49);
+        const pentecostEnd = new Date(pentecost.getTime() + 7 * 24 * 60 * 60 * 1000);
 
-        // Advent for current year
-        const adventCurrent = new Date(yearData.advent);
-        const adventYear = adventCurrent.getFullYear();
-
-        // Christmas season: Dec 25 - Jan 6 (Epiphany)
-        // Use the same year as Advent (since Advent leads into Christmas)
-        const christmas = new Date(adventYear, 11, 25);
+        // Epiphany is always Jan 6
         const epiphany = new Date(year, 0, 6);
 
-        // Check previous year's Advent if we're in early January
-        const prevYearData = this.years[year - 1];
-        const prevAdvent = prevYearData ? new Date(prevYearData.advent) : null;
+        // Get Advent for THIS year (note: Advent date is from PREVIOUS year)
+        const adventDate = new Date(yearData.advent);
 
-        // Determine season (skipping Epiphany)
-        console.log('Advent current:', adventCurrent.toISOString());
-        console.log('Christmas:', christmas.toISOString());
-        console.log('Epiphany:', epiphany.toISOString());
-        console.log('Ash Wednesday:', ashWednesday.toISOString());
+        console.log('Key dates:');
+        console.log('  Epiphany (Jan 6):', epiphany.toISOString());
+        console.log('  Ash Wednesday:', ashWednesday.toISOString());
+        console.log('  Easter:', easter.toISOString());
+        console.log('  Pentecost:', pentecost.toISOString());
+        console.log('  Advent starts:', adventDate.toISOString());
 
-        if (now >= adventCurrent && now < christmas) {
-            console.log('DETECTED: advent');
-            return 'advent';
-        } else if (now >= christmas && now <= new Date(year, 11, 31)) {
-            console.log('DETECTED: christmas (Dec 25-31)');
-            return 'christmas';
-        } else if (now >= new Date(year, 0, 1) && now <= epiphany) {
+        // SIMPLIFIED LOGIC: Check seasons in chronological order for the current year
+
+        // Jan 1-6: Christmas (continuation from previous year's Dec 25)
+        if (month === 0 && now.getDate() <= 6) {
             console.log('DETECTED: christmas (Jan 1-6)');
             return 'christmas';
-        } else if (prevAdvent && now >= prevAdvent && now < christmas) {
-            console.log('DETECTED: advent (from prev year)');
-            return 'advent';
-        } else if (now > epiphany && now < ashWednesday) {
+        }
+
+        // Jan 7 - Ash Wednesday: Ordinary Time (Epiphany period)
+        if (now > epiphany && now < ashWednesday) {
             console.log('DETECTED: ordinary-time (after Epiphany)');
             return 'ordinary-time';
-        } else if (now >= ashWednesday && now < easter) {
+        }
+
+        // Ash Wednesday - Easter: Lent
+        if (now >= ashWednesday && now < easter) {
             console.log('DETECTED: lent');
             return 'lent';
-        } else if (now >= easter && now < pentecost) {
+        }
+
+        // Easter - Pentecost: Easter
+        if (now >= easter && now < pentecost) {
             console.log('DETECTED: easter');
             return 'easter';
-        } else if (now >= pentecost && now < new Date(pentecost.getTime() + 7 * 24 * 60 * 60 * 1000)) {
+        }
+
+        // Pentecost week: Pentecost
+        if (now >= pentecost && now < pentecostEnd) {
             console.log('DETECTED: pentecost');
             return 'pentecost';
-        } else {
-            console.log('DETECTED: ordinary-time (default)');
+        }
+
+        // After Pentecost - Advent: Ordinary Time
+        if (now >= pentecostEnd && now < adventDate) {
+            console.log('DETECTED: ordinary-time (after Pentecost)');
             return 'ordinary-time';
         }
+
+        // Advent - Dec 24: Advent
+        if (now >= adventDate && now < new Date(year, 11, 25)) {
+            console.log('DETECTED: advent');
+            return 'advent';
+        }
+
+        // Dec 25-31: Christmas
+        if (month === 11 && now.getDate() >= 25) {
+            console.log('DETECTED: christmas (Dec 25-31)');
+            return 'christmas';
+        }
+
+        // Fallback
+        console.log('DETECTED: ordinary-time (fallback)');
+        return 'ordinary-time';
     },
 
     getSeasonOrder() {
