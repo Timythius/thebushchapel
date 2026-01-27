@@ -421,6 +421,14 @@ function initializeMobileMenu() {
 // ============================================
 // Liturgical Calendar System (2025-2035)
 // ============================================
+//
+// This site uses 6 liturgical seasons (Epiphany is included in Ordinary Time):
+// 1. Advent
+// 2. Christmas
+// 3. Ordinary Time (includes Epiphany and post-Pentecost periods)
+// 4. Lent
+// 5. Easter
+// 6. Pentecost
 
 const liturgicalCalendar = {
     // Liturgical dates for 2025-2035 (Melbourne, Australia)
@@ -496,6 +504,7 @@ const liturgicalCalendar = {
         console.log('  Advent starts:', adventDate.toISOString());
 
         // SIMPLIFIED LOGIC: Check seasons in chronological order for the current year
+        // NOTE: We only use 6 seasons - Epiphany is included in Ordinary Time
 
         // Jan 1-6: Christmas (continuation from previous year's Dec 25)
         if (month === 0 && now.getDate() <= 6) {
@@ -503,9 +512,9 @@ const liturgicalCalendar = {
             return 'christmas';
         }
 
-        // Jan 7 - Ash Wednesday: Ordinary Time (Epiphany period)
+        // Jan 7 - Ash Wednesday: Ordinary Time (includes what liturgically is Epiphany)
         if (now > epiphany && now < ashWednesday) {
-            console.log('DETECTED: ordinary-time (after Epiphany)');
+            console.log('DETECTED: ordinary-time (Jan 7 - Ash Wed, includes Epiphany)');
             return 'ordinary-time';
         }
 
@@ -527,9 +536,9 @@ const liturgicalCalendar = {
             return 'pentecost';
         }
 
-        // After Pentecost - Advent: Ordinary Time
+        // After Pentecost - Advent: Ordinary Time (second period)
         if (now >= pentecostEnd && now < adventDate) {
-            console.log('DETECTED: ordinary-time (after Pentecost)');
+            console.log('DETECTED: ordinary-time (after Pentecost until Advent)');
             return 'ordinary-time';
         }
 
