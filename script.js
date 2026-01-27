@@ -477,9 +477,11 @@ const liturgicalCalendar = {
 
         // Advent for current year
         const adventCurrent = new Date(yearData.advent);
+        const adventYear = adventCurrent.getFullYear();
 
         // Christmas season: Dec 25 - Jan 6 (Epiphany)
-        const christmas = new Date(year, 11, 25);
+        // Use the same year as Advent (since Advent leads into Christmas)
+        const christmas = new Date(adventYear, 11, 25);
         const epiphany = new Date(year, 0, 6);
 
         // Check previous year's Advent if we're in early January
