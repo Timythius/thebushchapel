@@ -466,6 +466,10 @@ const liturgicalCalendar = {
         const year = now.getFullYear();
         const yearData = this.years[year];
 
+        console.log('=== SEASON DETECTION DEBUG ===');
+        console.log('Current date:', now.toISOString());
+        console.log('Current year:', year);
+
         if (!yearData) return 'ordinary-time';
 
         const easter = new Date(yearData.easter);
@@ -489,23 +493,37 @@ const liturgicalCalendar = {
         const prevAdvent = prevYearData ? new Date(prevYearData.advent) : null;
 
         // Determine season (skipping Epiphany)
+        console.log('Advent current:', adventCurrent.toISOString());
+        console.log('Christmas:', christmas.toISOString());
+        console.log('Epiphany:', epiphany.toISOString());
+        console.log('Ash Wednesday:', ashWednesday.toISOString());
+
         if (now >= adventCurrent && now < christmas) {
+            console.log('DETECTED: advent');
             return 'advent';
         } else if (now >= christmas && now <= new Date(year, 11, 31)) {
+            console.log('DETECTED: christmas (Dec 25-31)');
             return 'christmas';
         } else if (now >= new Date(year, 0, 1) && now <= epiphany) {
+            console.log('DETECTED: christmas (Jan 1-6)');
             return 'christmas';
         } else if (prevAdvent && now >= prevAdvent && now < christmas) {
+            console.log('DETECTED: advent (from prev year)');
             return 'advent';
         } else if (now > epiphany && now < ashWednesday) {
+            console.log('DETECTED: ordinary-time (after Epiphany)');
             return 'ordinary-time';
         } else if (now >= ashWednesday && now < easter) {
+            console.log('DETECTED: lent');
             return 'lent';
         } else if (now >= easter && now < pentecost) {
+            console.log('DETECTED: easter');
             return 'easter';
         } else if (now >= pentecost && now < new Date(pentecost.getTime() + 7 * 24 * 60 * 60 * 1000)) {
+            console.log('DETECTED: pentecost');
             return 'pentecost';
         } else {
+            console.log('DETECTED: ordinary-time (default)');
             return 'ordinary-time';
         }
     },
@@ -560,8 +578,11 @@ function rotateSeasonsGrid() {
     const seasonsGrid = document.querySelector('.seasons-grid');
     if (!seasonsGrid) return;
 
-    const seasonOrder = liturgicalCalendar.getSeasonOrder();
     const currentSeason = liturgicalCalendar.getCurrentSeason();
+    const seasonOrder = liturgicalCalendar.getSeasonOrder();
+
+    console.log('Current Season:', currentSeason);
+    console.log('Season Order:', seasonOrder);
 
     // Get all season cards
     const cards = {
