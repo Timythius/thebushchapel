@@ -1,1 +1,13 @@
-.vercel
+# macOS system files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Duplicate image files (already copied to graphics folder with better names)
+emma.png
+peter.png
+
+# Unused images
+the bush chapel graphics/st-andrews-church.jpg
