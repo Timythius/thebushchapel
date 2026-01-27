@@ -215,6 +215,11 @@ main {
     .hero-banner {
         display: none;
     }
+
+    /* Hide photo caption on mobile */
+    .photo-caption {
+        display: none;
+    }
 }
 
 /* Welcome Section */
