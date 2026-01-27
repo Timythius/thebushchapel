@@ -419,92 +419,184 @@ function initializeMobileMenu() {
 }
 
 // ============================================
-// Liturgical Season Detection
+// Liturgical Calendar System (2025-2035)
 // ============================================
 
-function getCurrentLiturgicalSeason() {
-    const now = new Date();
-    const year = now.getFullYear();
+const liturgicalCalendar = {
+    // Liturgical dates for 2025-2035 (Melbourne, Australia)
+    // Sources: Church of England Calendar, Anglican Compass
+    years: {
+        2025: { easter: '2025-04-20', advent: '2024-11-30' },
+        2026: { easter: '2026-04-05', advent: '2025-11-29' },
+        2027: { easter: '2027-03-28', advent: '2026-11-28' },
+        2028: { easter: '2028-04-16', advent: '2027-12-03' },
+        2029: { easter: '2029-04-01', advent: '2028-12-02' },
+        2030: { easter: '2030-04-21', advent: '2029-12-01' },
+        2031: { easter: '2031-04-13', advent: '2030-11-30' },
+        2032: { easter: '2032-03-28', advent: '2031-11-28' },
+        2033: { easter: '2033-04-17', advent: '2032-11-27' },
+        2034: { easter: '2034-04-09', advent: '2033-12-03' },
+        2035: { easter: '2035-03-25', advent: '2034-12-02' }
+    },
 
-    // Calculate Easter (using Anonymous Gregorian algorithm)
-    const a = year % 19;
-    const b = Math.floor(year / 100);
-    const c = year % 100;
-    const d = Math.floor(b / 4);
-    const e = b % 4;
-    const f = Math.floor((b + 8) / 25);
-    const g = Math.floor((b - f + 1) / 3);
-    const h = (19 * a + b - d - g + 15) % 30;
-    const i = Math.floor(c / 4);
-    const k = c % 4;
-    const l = (32 + 2 * e + 2 * i - h - k) % 7;
-    const m = Math.floor((a + 11 * h + 22 * l) / 451);
-    const month = Math.floor((h + l - 7 * m + 114) / 31);
-    const day = ((h + l - 7 * m + 114) % 31) + 1;
+    // Video/content availability for each season
+    content: {
+        lent: {
+            available: true,
+            videoId: 'DAB7XcuyvOA',
+            title: 'Lent Liturgy',
+            description: '',
+            pdfUrl: 'liturgies/lent-liturgy.pdf'
+        },
+        advent: {
+            available: true,
+            videoId: 'DAB7XcuyvOA',
+            title: 'Advent Liturgy',
+            description: '',
+            pdfUrl: 'liturgies/advent-liturgy.pdf'
+        },
+        christmas: { available: false },
+        easter: { available: false },
+        pentecost: { available: false },
+        'ordinary-time': { available: false }
+    },
 
-    const easter = new Date(year, month - 1, day);
+    getCurrentSeason() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const yearData = this.years[year];
 
-    // Calculate other dates
-    const ashWednesday = new Date(easter);
-    ashWednesday.setDate(easter.getDate() - 46);
+        if (!yearData) return 'ordinary-time';
 
-    const pentecost = new Date(easter);
-    pentecost.setDate(easter.getDate() + 49);
+        const easter = new Date(yearData.easter);
+        const ashWednesday = new Date(easter);
+        ashWednesday.setDate(easter.getDate() - 46);
 
-    const advent1 = getAdventStart(year);
-    const christmas = new Date(year, 11, 25);
+        const pentecost = new Date(easter);
+        pentecost.setDate(easter.getDate() + 49);
 
-    // Determine current season
-    if (now >= advent1 && now < christmas) {
-        return 'advent';
-    } else if (now >= christmas || now < new Date(year, 0, 6)) {
-        return 'christmas';
-    } else if (now >= new Date(year, 0, 6) && now < ashWednesday) {
-        return 'epiphany';
-    } else if (now >= ashWednesday && now < easter) {
-        return 'lent';
-    } else if (now >= easter && now < pentecost) {
-        return 'easter';
-    } else if (now >= pentecost && now < new Date(pentecost.getTime() + 7 * 24 * 60 * 60 * 1000)) {
-        return 'pentecost';
-    } else {
-        return 'ordinary';
+        // Advent for current year
+        const adventCurrent = new Date(yearData.advent);
+
+        // Christmas season: Dec 25 - Jan 6 (Epiphany)
+        const christmas = new Date(year, 11, 25);
+        const epiphany = new Date(year, 0, 6);
+
+        // Check previous year's Advent if we're in early January
+        const prevYearData = this.years[year - 1];
+        const prevAdvent = prevYearData ? new Date(prevYearData.advent) : null;
+
+        // Determine season (skipping Epiphany)
+        if (now >= adventCurrent && now < christmas) {
+            return 'advent';
+        } else if (now >= christmas && now <= new Date(year, 11, 31)) {
+            return 'christmas';
+        } else if (now >= new Date(year, 0, 1) && now <= epiphany) {
+            return 'christmas';
+        } else if (prevAdvent && now >= prevAdvent && now < christmas) {
+            return 'advent';
+        } else if (now > epiphany && now < ashWednesday) {
+            return 'ordinary-time';
+        } else if (now >= ashWednesday && now < easter) {
+            return 'lent';
+        } else if (now >= easter && now < pentecost) {
+            return 'easter';
+        } else if (now >= pentecost && now < new Date(pentecost.getTime() + 7 * 24 * 60 * 60 * 1000)) {
+            return 'pentecost';
+        } else {
+            return 'ordinary-time';
+        }
+    },
+
+    getSeasonOrder() {
+        const currentSeason = this.getCurrentSeason();
+        const seasons = ['advent', 'christmas', 'lent', 'easter', 'pentecost', 'ordinary-time'];
+        const currentIndex = seasons.indexOf(currentSeason);
+
+        // Rotate array to start with current season
+        return [...seasons.slice(currentIndex), ...seasons.slice(0, currentIndex)];
     }
+};
+
+// ============================================
+// Auto-update Homepage Content
+// ============================================
+
+function updateHomepageForSeason() {
+    const season = liturgicalCalendar.getCurrentSeason();
+    const seasonContent = liturgicalCalendar.content[season];
+    const videoSection = document.querySelector('.latest-video');
+
+    if (!videoSection) return;
+
+    if (!seasonContent || !seasonContent.available) {
+        // Hide video section if no content available
+        videoSection.style.display = 'none';
+        return;
+    }
+
+    // Update video section with current season content
+    videoSection.style.display = 'block';
+
+    const iframe = videoSection.querySelector('iframe');
+    const title = videoSection.querySelector('.video-info h3');
+    const description = videoSection.querySelector('.video-description');
+    const pdfLink = videoSection.querySelector('.view-more');
+
+    if (iframe) {
+        iframe.src = `https://www.youtube.com/embed/${seasonContent.videoId}`;
+        iframe.title = `${seasonContent.title} - The Bush Chapel`;
+    }
+
+    if (title) title.textContent = seasonContent.title;
+    if (description) description.textContent = seasonContent.description;
+    if (pdfLink) pdfLink.href = seasonContent.pdfUrl;
 }
 
-function getAdventStart(year) {
-    // Advent starts on the 4th Sunday before Christmas
-    const christmas = new Date(year, 11, 25);
-    const dayOfWeek = christmas.getDay();
-    const daysUntilSunday = dayOfWeek === 0 ? 7 : dayOfWeek;
-    const advent4 = new Date(year, 11, 25 - daysUntilSunday);
-    const advent1 = new Date(advent4);
-    advent1.setDate(advent4.getDate() - 21);
-    return advent1;
-}
+function rotateSeasonsGrid() {
+    const seasonsGrid = document.querySelector('.seasons-grid');
+    if (!seasonsGrid) return;
 
-function highlightCurrentSeason() {
-    const season = getCurrentLiturgicalSeason();
-    const seasonCard = document.querySelector(`.season-card.${season}`);
-    if (seasonCard) {
-        seasonCard.classList.add('current-season');
-        // Add a subtle indicator
-        const indicator = document.createElement('span');
-        indicator.className = 'current-indicator';
-        indicator.textContent = 'Current Season';
-        indicator.style.cssText = `
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #c97c4c;
-            color: white;
-            font-size: 0.7rem;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-weight: 600;
-        `;
-        seasonCard.appendChild(indicator);
-    }
+    const seasonOrder = liturgicalCalendar.getSeasonOrder();
+    const currentSeason = liturgicalCalendar.getCurrentSeason();
+
+    // Get all season cards
+    const cards = {
+        'advent': seasonsGrid.querySelector('.season-card.advent'),
+        'christmas': seasonsGrid.querySelector('.season-card.christmas'),
+        'lent': seasonsGrid.querySelector('.season-card.lent'),
+        'easter': seasonsGrid.querySelector('.season-card.easter'),
+        'pentecost': seasonsGrid.querySelector('.season-card.pentecost'),
+        'ordinary-time': seasonsGrid.querySelector('.season-card.ordinary')
+    };
+
+    // Clear the grid
+    seasonsGrid.innerHTML = '';
+
+    // Re-add cards in new order
+    seasonOrder.forEach((seasonKey, index) => {
+        const card = cards[seasonKey];
+        if (!card) return;
+
+        // Add "Current Season" label to first card
+        if (index === 0) {
+            // Remove any existing current season label
+            const existingLabel = card.querySelector('p[style*="italic"]');
+            if (existingLabel) existingLabel.remove();
+
+            // Add new label
+            const label = document.createElement('p');
+            label.style.cssText = 'font-size: 0.9rem; margin-top: 0.5rem; font-style: italic;';
+            label.textContent = 'Current Season';
+            card.appendChild(label);
+        } else {
+            // Remove current season label from non-current cards
+            const existingLabel = card.querySelector('p[style*="italic"]');
+            if (existingLabel) existingLabel.remove();
+        }
+
+        seasonsGrid.appendChild(card);
+    });
 }
 
 // ============================================
@@ -521,7 +613,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeScrollAnimations();
     updateActiveNavigation();
     initializeMobileMenu();
-    highlightCurrentSeason();
+
+    // Auto-update liturgical content
+    updateHomepageForSeason();
+    rotateSeasonsGrid();
 
     // Add CSS for notifications
     const style = document.createElement('style');
