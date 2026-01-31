@@ -1,7 +1,568 @@
 /**
  * The Bush Chapel - Interactive Features
- * Comment system, animations, and user interactions
+ * Comment system, animations, user interactions, and Firebase community board
  */
+
+// ============================================
+// Community Board System (Firebase)
+// ============================================
+
+class CommunityBoard {
+    constructor() {
+        this.db = null;
+        this.auth = null;
+        this.currentUser = null;
+        this.isAdmin = false;
+        this.unsubscribeMessages = null;
+        this.unsubscribePending = null;
+    }
+
+    // Initialize Firebase
+    init() {
+        // Check if Firebase is available and config exists
+        if (typeof firebase === 'undefined' || typeof firebaseConfig === 'undefined') {
+            return false;
+        }
+
+        // Initialize Firebase if not already done
+        if (!firebase.apps.length) {
+            firebase.initializeApp(firebaseConfig);
+        }
+
+        this.auth = firebase.auth();
+        this.db = firebase.firestore();
+
+        // Set up auth state listener
+        this.auth.onAuthStateChanged((user) => {
+            this.currentUser = user;
+            this.updateUIForAuthState();
+            if (user) {
+                this.checkAdminStatus(user.email);
+            }
+        });
+
+        // Set up UI event listeners
+        this.setupEventListeners();
+
+        // Load public messages
+        this.loadMessages();
+
+        return true;
+    }
+
+    // Check if user is admin
+    async checkAdminStatus(email) {
+        this.isAdmin = (email === ADMIN_EMAIL);
+        this.updateAdminUI();
+        if (this.isAdmin) {
+            this.loadPendingMessages();
+        }
+    }
+
+    // Update UI based on auth state
+    updateUIForAuthState() {
+        const loggedOutEl = document.getElementById('auth-logged-out');
+        const loggedInEl = document.getElementById('auth-logged-in');
+        const composeSection = document.getElementById('compose-section');
+        const userNameEl = document.getElementById('user-display-name');
+
+        if (this.currentUser) {
+            if (loggedOutEl) loggedOutEl.style.display = 'none';
+            if (loggedInEl) loggedInEl.style.display = 'block';
+            if (composeSection) composeSection.style.display = 'block';
+            if (userNameEl) userNameEl.textContent = this.currentUser.displayName || this.currentUser.email;
+        } else {
+            if (loggedOutEl) loggedOutEl.style.display = 'block';
+            if (loggedInEl) loggedInEl.style.display = 'none';
+            if (composeSection) composeSection.style.display = 'none';
+        }
+    }
+
+    // Update admin panel visibility
+    updateAdminUI() {
+        const adminPanel = document.getElementById('admin-panel');
+        if (adminPanel) {
+            adminPanel.style.display = this.isAdmin ? 'block' : 'none';
+        }
+    }
+
+    // Set up event listeners
+    setupEventListeners() {
+        // Auth tab switching
+        const authTabs = document.querySelectorAll('.auth-tab');
+        authTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                this.switchAuthTab(tab.dataset.tab);
+            });
+        });
+
+        // Login form
+        const loginForm = document.getElementById('login-form');
+        if (loginForm) {
+            loginForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleLogin();
+            });
+        }
+
+        // Register form
+        const registerForm = document.getElementById('register-form');
+        if (registerForm) {
+            registerForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleRegister();
+            });
+        }
+
+        // Logout button
+        const logoutBtn = document.getElementById('logout-btn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                this.handleLogout();
+            });
+        }
+
+        // Message form
+        const messageForm = document.getElementById('message-form');
+        if (messageForm) {
+            messageForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.postMessage();
+            });
+        }
+    }
+
+    // Switch between login and register tabs
+    switchAuthTab(tab) {
+        const tabs = document.querySelectorAll('.auth-tab');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+
+        tabs.forEach(t => t.classList.remove('active'));
+        document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+
+        if (tab === 'login') {
+            loginForm.style.display = 'block';
+            registerForm.style.display = 'none';
+        } else {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'block';
+        }
+    }
+
+    // Handle login
+    async handleLogin() {
+        const email = document.getElementById('login-email').value;
+        const password = document.getElementById('login-password').value;
+        const errorEl = document.getElementById('login-error');
+
+        try {
+            errorEl.textContent = '';
+            await this.auth.signInWithEmailAndPassword(email, password);
+            showNotification('Welcome back!');
+        } catch (error) {
+            errorEl.textContent = this.getErrorMessage(error.code);
+        }
+    }
+
+    // Handle registration
+    async handleRegister() {
+        const name = document.getElementById('register-name').value;
+        const email = document.getElementById('register-email').value;
+        const password = document.getElementById('register-password').value;
+        const errorEl = document.getElementById('register-error');
+
+        try {
+            errorEl.textContent = '';
+            const userCredential = await this.auth.createUserWithEmailAndPassword(email, password);
+
+            // Update display name
+            await userCredential.user.updateProfile({
+                displayName: name
+            });
+
+            // Create user document in Firestore
+            await this.db.collection('users').doc(userCredential.user.uid).set({
+                email: email,
+                displayName: name,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                isAdmin: email === ADMIN_EMAIL
+            });
+
+            showNotification('Welcome to the community!');
+        } catch (error) {
+            errorEl.textContent = this.getErrorMessage(error.code);
+        }
+    }
+
+    // Handle logout
+    async handleLogout() {
+        try {
+            await this.auth.signOut();
+            this.isAdmin = false;
+            this.updateAdminUI();
+            showNotification('You have been signed out.');
+        } catch (error) {
+            console.error('Logout error:', error);
+        }
+    }
+
+    // Post a new message
+    async postMessage() {
+        if (!this.currentUser) {
+            showNotification('Please sign in to post a message.');
+            return;
+        }
+
+        const content = document.getElementById('message-content').value.trim();
+        const isPrivate = document.getElementById('message-private').checked;
+
+        if (!content) {
+            showNotification('Please enter a message.');
+            return;
+        }
+
+        try {
+            await this.db.collection('messages').add({
+                authorId: this.currentUser.uid,
+                authorName: this.currentUser.displayName || this.currentUser.email,
+                content: content,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                isPrivate: isPrivate,
+                isApproved: false,
+                threadId: null
+            });
+
+            // Clear form
+            document.getElementById('message-content').value = '';
+            document.getElementById('message-private').checked = false;
+
+            showNotification('Your message has been submitted for review.');
+        } catch (error) {
+            console.error('Error posting message:', error);
+            showNotification('Error posting message. Please try again.');
+        }
+    }
+
+    // Load approved public messages
+    loadMessages() {
+        const container = document.getElementById('messages-container');
+        if (!container) return;
+
+        // Real-time listener for approved public messages
+        this.unsubscribeMessages = this.db.collection('messages')
+            .where('isApproved', '==', true)
+            .where('isPrivate', '==', false)
+            .orderBy('createdAt', 'desc')
+            .limit(50)
+            .onSnapshot((snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<p class="no-messages">No messages yet. Be the first to share!</p>';
+                    return;
+                }
+
+                const messages = [];
+                snapshot.forEach(doc => {
+                    messages.push({ id: doc.id, ...doc.data() });
+                });
+
+                this.renderMessages(messages, container);
+            }, (error) => {
+                console.error('Error loading messages:', error);
+                if (error.code === 'failed-precondition') {
+                    container.innerHTML = '<p class="no-messages">Setting up the message board... Please refresh in a moment.</p>';
+                } else {
+                    container.innerHTML = '<p class="error-message">Error loading messages. Please try refreshing the page.</p>';
+                }
+            });
+    }
+
+    // Load pending messages for admin
+    loadPendingMessages() {
+        const container = document.getElementById('pending-messages');
+        if (!container || !this.isAdmin) return;
+
+        this.unsubscribePending = this.db.collection('messages')
+            .where('isApproved', '==', false)
+            .orderBy('createdAt', 'desc')
+            .onSnapshot((snapshot) => {
+                if (snapshot.empty) {
+                    container.innerHTML = '<p class="no-messages">No pending messages.</p>';
+                    return;
+                }
+
+                const messages = [];
+                snapshot.forEach(doc => {
+                    messages.push({ id: doc.id, ...doc.data() });
+                });
+
+                this.renderPendingMessages(messages, container);
+            }, (error) => {
+                console.error('Error loading pending messages:', error);
+                if (error.code === 'failed-precondition') {
+                    container.innerHTML = '<p class="no-messages">Index building... Refresh shortly.</p>';
+                }
+            });
+    }
+
+    // Render messages
+    renderMessages(messages, container) {
+        // Group messages by thread
+        const topLevel = messages.filter(m => !m.threadId);
+        const replies = messages.filter(m => m.threadId);
+
+        let html = '';
+        topLevel.forEach(message => {
+            const messageReplies = replies.filter(r => r.threadId === message.id);
+            html += this.createMessageHTML(message, messageReplies);
+        });
+
+        container.innerHTML = html;
+
+        // Attach reply button handlers
+        container.querySelectorAll('.message-reply-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.showReplyForm(btn.dataset.messageId);
+            });
+        });
+    }
+
+    // Render pending messages for admin
+    renderPendingMessages(messages, container) {
+        let html = '';
+        messages.forEach(message => {
+            html += this.createPendingMessageHTML(message);
+        });
+
+        container.innerHTML = html;
+
+        // Attach approve/delete handlers
+        container.querySelectorAll('.approve-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.approveMessage(btn.dataset.messageId);
+            });
+        });
+
+        container.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.deleteMessage(btn.dataset.messageId);
+            });
+        });
+    }
+
+    // Create message HTML
+    createMessageHTML(message, replies = []) {
+        const date = message.createdAt ? this.formatDate(message.createdAt.toDate()) : 'Just now';
+        const privateIndicator = message.isPrivate ? '<span class="private-indicator">Private</span>' : '';
+
+        let repliesHTML = '';
+        if (replies.length > 0) {
+            repliesHTML = '<div class="message-replies">' +
+                replies.map(reply => {
+                    const replyDate = reply.createdAt ? this.formatDate(reply.createdAt.toDate()) : 'Just now';
+                    return `
+                        <div class="message reply">
+                            <div class="message-header">
+                                <span class="message-author">${escapeHTML(reply.authorName)}</span>
+                                <span class="message-date">${replyDate}</span>
+                            </div>
+                            <div class="message-body">${escapeHTML(reply.content)}</div>
+                        </div>
+                    `;
+                }).join('') +
+                '</div>';
+        }
+
+        const replyButton = this.currentUser ?
+            `<button class="message-reply-btn" data-message-id="${message.id}">Reply</button>` : '';
+
+        return `
+            <div class="message" data-message-id="${message.id}">
+                <div class="message-header">
+                    <span class="message-author">${escapeHTML(message.authorName)}</span>
+                    <span class="message-date">${date}</span>
+                    ${privateIndicator}
+                </div>
+                <div class="message-body">${escapeHTML(message.content)}</div>
+                <div class="message-actions">
+                    ${replyButton}
+                </div>
+                <div class="reply-form-container" id="reply-form-${message.id}"></div>
+                ${repliesHTML}
+            </div>
+        `;
+    }
+
+    // Create pending message HTML for admin
+    createPendingMessageHTML(message) {
+        const date = message.createdAt ? this.formatDate(message.createdAt.toDate()) : 'Just now';
+        const privateIndicator = message.isPrivate ? '<span class="private-indicator">Private</span>' : '';
+
+        return `
+            <div class="message pending" data-message-id="${message.id}">
+                <div class="message-header">
+                    <span class="message-author">${escapeHTML(message.authorName)}</span>
+                    <span class="message-date">${date}</span>
+                    ${privateIndicator}
+                </div>
+                <div class="message-body">${escapeHTML(message.content)}</div>
+                <div class="admin-actions">
+                    <button class="approve-btn" data-message-id="${message.id}">Approve</button>
+                    <button class="delete-btn" data-message-id="${message.id}">Delete</button>
+                </div>
+            </div>
+        `;
+    }
+
+    // Show reply form
+    showReplyForm(messageId) {
+        // Remove existing reply forms
+        document.querySelectorAll('.reply-form-container').forEach(el => {
+            el.innerHTML = '';
+        });
+
+        const container = document.getElementById(`reply-form-${messageId}`);
+        if (!container) return;
+
+        container.innerHTML = `
+            <form class="reply-form" id="reply-form-submit-${messageId}">
+                <div class="form-group">
+                    <textarea id="reply-content-${messageId}" rows="3" placeholder="Write your reply..." required></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="submit-reply-btn">Post Reply</button>
+                    <button type="button" class="cancel-reply-btn" data-message-id="${messageId}">Cancel</button>
+                </div>
+            </form>
+        `;
+
+        // Attach form submit handler
+        const form = document.getElementById(`reply-form-submit-${messageId}`);
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            this.replyToMessage(messageId);
+        });
+
+        // Attach cancel handler
+        container.querySelector('.cancel-reply-btn').addEventListener('click', () => {
+            container.innerHTML = '';
+        });
+
+        // Focus textarea
+        document.getElementById(`reply-content-${messageId}`).focus();
+    }
+
+    // Reply to a message
+    async replyToMessage(parentMessageId) {
+        if (!this.currentUser) {
+            showNotification('Please sign in to reply.');
+            return;
+        }
+
+        const content = document.getElementById(`reply-content-${parentMessageId}`).value.trim();
+        if (!content) {
+            showNotification('Please enter a reply.');
+            return;
+        }
+
+        try {
+            await this.db.collection('messages').add({
+                authorId: this.currentUser.uid,
+                authorName: this.currentUser.displayName || this.currentUser.email,
+                content: content,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                isPrivate: false,
+                isApproved: false,
+                threadId: parentMessageId
+            });
+
+            // Clear reply form
+            document.getElementById(`reply-form-${parentMessageId}`).innerHTML = '';
+
+            showNotification('Your reply has been submitted for review.');
+        } catch (error) {
+            console.error('Error posting reply:', error);
+            showNotification('Error posting reply. Please try again.');
+        }
+    }
+
+    // Approve a message (admin only)
+    async approveMessage(messageId) {
+        if (!this.isAdmin) return;
+
+        try {
+            await this.db.collection('messages').doc(messageId).update({
+                isApproved: true
+            });
+            showNotification('Message approved.');
+        } catch (error) {
+            console.error('Error approving message:', error);
+            showNotification('Error approving message.');
+        }
+    }
+
+    // Delete a message (admin only)
+    async deleteMessage(messageId) {
+        if (!this.isAdmin) return;
+
+        if (!confirm('Are you sure you want to delete this message?')) {
+            return;
+        }
+
+        try {
+            await this.db.collection('messages').doc(messageId).delete();
+            showNotification('Message deleted.');
+        } catch (error) {
+            console.error('Error deleting message:', error);
+            showNotification('Error deleting message.');
+        }
+    }
+
+    // Format date
+    formatDate(date) {
+        const options = {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        };
+        return date.toLocaleDateString('en-AU', options);
+    }
+
+    // Get user-friendly error message
+    getErrorMessage(errorCode) {
+        switch (errorCode) {
+            case 'auth/email-already-in-use':
+                return 'This email is already registered. Please sign in instead.';
+            case 'auth/invalid-email':
+                return 'Please enter a valid email address.';
+            case 'auth/weak-password':
+                return 'Password must be at least 6 characters.';
+            case 'auth/user-not-found':
+                return 'No account found with this email.';
+            case 'auth/wrong-password':
+                return 'Incorrect password. Please try again.';
+            case 'auth/too-many-requests':
+                return 'Too many attempts. Please try again later.';
+            default:
+                return 'An error occurred. Please try again.';
+        }
+    }
+
+    // Cleanup listeners
+    destroy() {
+        if (this.unsubscribeMessages) {
+            this.unsubscribeMessages();
+        }
+        if (this.unsubscribePending) {
+            this.unsubscribePending();
+        }
+    }
+}
+
+// Global community board instance
+let communityBoard = null;
 
 // ============================================
 // Comment System
@@ -475,9 +1036,7 @@ const liturgicalCalendar = {
         const month = now.getMonth(); // 0-11
         const yearData = this.years[year];
 
-        console.log('=== SEASON DETECTION DEBUG ===');
-        console.log('Current date:', now.toISOString());
-        console.log('Current year:', year, 'Month:', month);
+        // Season detection (debug logging disabled)
 
         if (!yearData) return 'ordinary-time';
 
@@ -496,61 +1055,55 @@ const liturgicalCalendar = {
         // Get Advent for THIS year (note: Advent date is from PREVIOUS year)
         const adventDate = new Date(yearData.advent);
 
-        console.log('Key dates:');
-        console.log('  Epiphany (Jan 6):', epiphany.toISOString());
-        console.log('  Ash Wednesday:', ashWednesday.toISOString());
-        console.log('  Easter:', easter.toISOString());
-        console.log('  Pentecost:', pentecost.toISOString());
-        console.log('  Advent starts:', adventDate.toISOString());
 
         // SIMPLIFIED LOGIC: Check seasons in chronological order for the current year
         // NOTE: We only use 6 seasons - Epiphany is included in Ordinary Time
 
         // Jan 1-6: Christmas (continuation from previous year's Dec 25)
         if (month === 0 && now.getDate() <= 6) {
-            console.log('DETECTED: christmas (Jan 1-6)');
+            // Detected: christmas (Jan 1-6)');
             return 'christmas';
         }
 
         // Jan 7 - Ash Wednesday: Ordinary Time (includes what liturgically is Epiphany)
         if (now > epiphany && now < ashWednesday) {
-            console.log('DETECTED: ordinary-time (Jan 7 - Ash Wed, includes Epiphany)');
+            // Detected: ordinary-time (Jan 7 - Ash Wed, includes Epiphany)');
             return 'ordinary-time';
         }
 
         // Ash Wednesday - Easter: Lent
         if (now >= ashWednesday && now < easter) {
-            console.log('DETECTED: lent');
+            // Detected: lent');
             return 'lent';
         }
 
         // Easter - Pentecost: Easter
         if (now >= easter && now < pentecost) {
-            console.log('DETECTED: easter');
+            // Detected: easter');
             return 'easter';
         }
 
         // Pentecost week: Pentecost
         if (now >= pentecost && now < pentecostEnd) {
-            console.log('DETECTED: pentecost');
+            // Detected: pentecost');
             return 'pentecost';
         }
 
         // After Pentecost - Advent: Ordinary Time (second period)
         if (now >= pentecostEnd && now < adventDate) {
-            console.log('DETECTED: ordinary-time (after Pentecost until Advent)');
+            // Detected: ordinary-time (after Pentecost until Advent)');
             return 'ordinary-time';
         }
 
         // Advent - Dec 24: Advent
         if (now >= adventDate && now < new Date(year, 11, 25)) {
-            console.log('DETECTED: advent');
+            // Detected: advent');
             return 'advent';
         }
 
         // Dec 25-31: Christmas
         if (month === 11 && now.getDate() >= 25) {
-            console.log('DETECTED: christmas (Dec 25-31)');
+            // Detected: christmas (Dec 25-31)');
             return 'christmas';
         }
 
@@ -612,8 +1165,6 @@ function rotateSeasonsGrid() {
     const currentSeason = liturgicalCalendar.getCurrentSeason();
     const seasonOrder = liturgicalCalendar.getSeasonOrder();
 
-    console.log('Current Season:', currentSeason);
-    console.log('Season Order:', seasonOrder);
 
     // Get all season cards
     const cards = {
@@ -672,6 +1223,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Auto-update liturgical content
     updateHomepageForSeason();
     rotateSeasonsGrid();
+
+    // Initialize community board if on community page
+    if (window.location.pathname.includes('community')) {
+        communityBoard = new CommunityBoard();
+        communityBoard.init();
+    }
 
     // Add CSS for notifications
     const style = document.createElement('style');

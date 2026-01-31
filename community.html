@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community - The Bush Chapel</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <!-- Fixed botanical corner decorations -->
+    <div class="botanical-corner top-left">
+        <img src="the bush chapel graphics/2.png" alt="" aria-hidden="true">
+    </div>
+    <div class="botanical-corner top-right">
+        <img src="the bush chapel graphics/7.png" alt="" aria-hidden="true">
+    </div>
+    <div class="botanical-corner bottom-left">
+        <img src="the bush chapel graphics/7.png" alt="" aria-hidden="true">
+    </div>
+    <div class="botanical-corner bottom-right">
+        <img src="the bush chapel graphics/2.png" alt="" aria-hidden="true">
+    </div>
+
+    <header class="main-header">
+        <!-- Mobile botanical decorations -->
+        <div class="mobile-botanical left">
+            <img src="the bush chapel graphics/5.png" alt="" aria-hidden="true">
+        </div>
+        <div class="mobile-botanical right">
+            <img src="the bush chapel graphics/6.png" alt="" aria-hidden="true">
+        </div>
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>The Bush Chapel</h1>
+                <p class="tagline">Liturgies from the Australian Bush</p>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="meettheteam.html">Meet the Team</a></li>
+                    <li><a href="community.html" class="active">Community</a></li>
+                </ul>
+            </nav>
+        </div>
+        <!-- Header botanical accents -->
+        <div class="header-botanical left">
+            <img src="the bush chapel graphics/7.png" alt="" aria-hidden="true">
+        </div>
+        <div class="header-botanical right">
+            <img src="the bush chapel graphics/7.png" alt="" aria-hidden="true">
+        </div>
+    </header>
+
+    <main>
+        <article class="page-content">
+            <h1>Community Message Board</h1>
+            <p style="text-align: center; margin-bottom: 2rem; color: var(--gum-green);">
+                Share your reflections, prayer requests, and encouragement with our community.
+            </p>
+
+            <!-- Auth Section -->
+            <section class="auth-section gum-border-frame" id="auth-section">
+                <!-- Logged Out State -->
+                <div id="auth-logged-out">
+                    <div class="auth-tabs">
+                        <button class="auth-tab active" data-tab="login">Sign In</button>
+                        <button class="auth-tab" data-tab="register">Join Community</button>
+                    </div>
+
+                    <!-- Login Form -->
+                    <form id="login-form" class="auth-form">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" required>
+                        </div>
+                        <button type="submit" class="auth-btn">Sign In</button>
+                        <p class="auth-error" id="login-error"></p>
+                    </form>
+
+                    <!-- Register Form -->
+                    <form id="register-form" class="auth-form" style="display: none;">
+                        <div class="form-group">
+                            <label for="register-name">Display Name</label>
+                            <input type="text" id="register-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">Email</label>
+                            <input type="email" id="register-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Password (min 6 characters)</label>
+                            <input type="password" id="register-password" minlength="6" required>
+                        </div>
+                        <button type="submit" class="auth-btn">Join Community</button>
+                        <p class="auth-error" id="register-error"></p>
+                    </form>
+                </div>
+
+                <!-- Logged In State -->
+                <div id="auth-logged-in" style="display: none;">
+                    <div class="user-info">
+                        <span>Welcome, <strong id="user-display-name"></strong></span>
+                        <button id="logout-btn" class="logout-btn">Sign Out</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Message Compose Section (only visible when logged in) -->
+            <section class="compose-section gum-border-frame" id="compose-section" style="display: none;">
+                <h3>Share a Message</h3>
+                <form id="message-form">
+                    <div class="form-group">
+                        <label for="message-content">Your Message</label>
+                        <textarea id="message-content" rows="4" placeholder="Share your thoughts, reflections, or prayer requests..." required></textarea>
+                    </div>
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="message-private">
+                            <span>Private message (only visible to you and moderators)</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="submit-message-btn">Post Message</button>
+                    <p class="form-note">Messages are reviewed by moderators before appearing publicly.</p>
+                </form>
+            </section>
+
+            <!-- Admin Moderation Panel (only visible to admins) -->
+            <section class="admin-panel gum-border-frame" id="admin-panel" style="display: none;">
+                <h3>Moderation Panel</h3>
+                <p class="admin-note">Messages pending approval:</p>
+                <div id="pending-messages" class="messages-list">
+                    <!-- Pending messages will be loaded here -->
+                </div>
+            </section>
+
+            <!-- Botanical divider -->
+            <div class="botanical-divider">
+                <img src="the bush chapel graphics/2.png" alt="" aria-hidden="true">
+                <img src="the bush chapel graphics/4.png" alt="" aria-hidden="true">
+                <img src="the bush chapel graphics/2.png" alt="" aria-hidden="true">
+            </div>
+
+            <!-- Messages Section -->
+            <section class="messages-section">
+                <h2>Community Messages</h2>
+                <div id="messages-container" class="messages-list">
+                    <p class="loading-message">Loading messages...</p>
+                </div>
+            </section>
+
+        </article>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-bottom">
+            <p>&copy; 2026 The Bush Chapel</p>
+        </div>
+    </footer>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+
+    <!-- Firebase Config -->
+    <script src="firebase-config.js"></script>
+
+    <!-- Main Script -->
+    <script src="script.js"></script>
+</body>
+</html>

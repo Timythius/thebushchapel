@@ -1,0 +1,45 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Users collection
+    match /users/{userId} {
+      // Users can read their own document
+      allow read: if request.auth != null && request.auth.uid == userId;
+      // Users can create their own document
+      allow create: if request.auth != null && request.auth.uid == userId;
+      // Users can update their own document (but not isAdmin field)
+      allow update: if request.auth != null && request.auth.uid == userId
+                    && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['isAdmin']);
+    }
+
+    // Messages collection
+    match /messages/{messageId} {
+      // Anyone can read approved public messages
+      allow read: if resource.data.isApproved == true && resource.data.isPrivate == false;
+
+      // Authenticated users can read their own messages (including private)
+      allow read: if request.auth != null && resource.data.authorId == request.auth.uid;
+
+      // Admin can read all messages
+      allow read: if request.auth != null && request.auth.token.email == 'timmeybee@gmail.com';
+
+      // Authenticated users can create messages (pending approval)
+      allow create: if request.auth != null
+                    && request.resource.data.authorId == request.auth.uid
+                    && request.resource.data.isApproved == false;
+
+      // Only admin can update messages (for approval)
+      allow update: if request.auth != null && request.auth.token.email == 'timmeybee@gmail.com';
+
+      // Only admin can delete messages
+      allow delete: if request.auth != null && request.auth.token.email == 'timmeybee@gmail.com';
+    }
+
+    // Threads collection (optional, for tracking reply counts)
+    match /threads/{threadId} {
+      allow read: if true;
+      allow write: if request.auth != null && request.auth.token.email == 'timmeybee@gmail.com';
+    }
+  }
+}
