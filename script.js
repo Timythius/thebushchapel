@@ -130,6 +130,68 @@ class CommunityBoard {
                 this.postMessage();
             });
         }
+
+        // Forgot password link
+        const forgotPasswordBtn = document.getElementById('forgot-password-btn');
+        if (forgotPasswordBtn) {
+            forgotPasswordBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showForgotPasswordForm();
+            });
+        }
+
+        // Back to login link
+        const backToLoginBtn = document.getElementById('back-to-login-btn');
+        if (backToLoginBtn) {
+            backToLoginBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                this.showLoginForm();
+            });
+        }
+
+        // Forgot password form
+        const forgotPasswordForm = document.getElementById('forgot-password-form');
+        if (forgotPasswordForm) {
+            forgotPasswordForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handlePasswordReset();
+            });
+        }
+    }
+
+    // Show forgot password form
+    showForgotPasswordForm() {
+        document.getElementById('login-form').style.display = 'none';
+        document.getElementById('register-form').style.display = 'none';
+        document.getElementById('forgot-password-form').style.display = 'block';
+        document.querySelector('.auth-tabs').style.display = 'none';
+    }
+
+    // Show login form
+    showLoginForm() {
+        document.getElementById('login-form').style.display = 'block';
+        document.getElementById('register-form').style.display = 'none';
+        document.getElementById('forgot-password-form').style.display = 'none';
+        document.querySelector('.auth-tabs').style.display = 'flex';
+        document.querySelector('[data-tab="login"]').classList.add('active');
+        document.querySelector('[data-tab="register"]').classList.remove('active');
+    }
+
+    // Handle password reset
+    async handlePasswordReset() {
+        const email = document.getElementById('reset-email').value;
+        const errorEl = document.getElementById('reset-error');
+
+        try {
+            errorEl.textContent = '';
+            errorEl.style.color = 'var(--pentecost-red)';
+            await this.auth.sendPasswordResetEmail(email);
+            errorEl.style.color = 'var(--gum-green)';
+            errorEl.textContent = 'Reset link sent! Check your email.';
+            showNotification('Password reset email sent.');
+        } catch (error) {
+            errorEl.textContent = this.getErrorMessage(error.code);
+        }
     }
 
     // Switch between login and register tabs

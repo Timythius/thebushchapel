@@ -1789,6 +1789,20 @@ main {
     min-height: 1.2em;
 }
 
+.forgot-password-link {
+    margin-top: var(--space-sm);
+    font-size: 0.9rem;
+}
+
+.forgot-password-link a {
+    color: var(--ochre);
+}
+
+.forgot-password-link a:hover {
+    color: var(--campfire-orange);
+    text-decoration: underline;
+}
+
 /* User Info (logged in state) */
 .user-info {
     display: flex;
