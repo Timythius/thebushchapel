@@ -22,33 +22,11 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-
-      - name: Install yt-dlp
-        run: |
-          pip install yt-dlp
-
-      - name: Resolve YouTube channel ID
-        id: resolve_channel
-        run: |
-          # Resolve @Thebushchapel handle to channel ID
-          CHANNEL_ID=$(yt-dlp --print channel_id "https://www.youtube.com/@Thebushchapel" 2>/dev/null || echo "")
-
-          if [ -z "$CHANNEL_ID" ]; then
-            echo "Error: Failed to resolve channel ID"
-            exit 1
-          fi
-
-          echo "channel_id=$CHANNEL_ID" >> $GITHUB_OUTPUT
-          echo "Resolved channel ID: $CHANNEL_ID"
-
       - name: Fetch latest video from RSS feed
         id: fetch_video
         run: |
-          CHANNEL_ID="${{ steps.resolve_channel.outputs.channel_id }}"
+          # Hardcoded channel ID for @Thebushchapel
+          CHANNEL_ID="UC4LfSjlnX99HNzV3e87xpjA"
           RSS_URL="https://www.youtube.com/feeds/videos.xml?channel_id=$CHANNEL_ID"
 
           # Fetch RSS feed with retries
