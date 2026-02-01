@@ -1106,6 +1106,19 @@ main {
     line-height: 1.8;
 }
 
+.prayer-citation {
+    font-size: 0.9rem;
+    font-style: italic;
+    text-align: right;
+    margin-top: var(--space-md);
+    margin-bottom: 0;
+    opacity: 0.9;
+}
+
+.prayer-citation cite {
+    font-style: normal;
+}
+
 .liturgy-list {
     display: grid;
     gap: var(--space-md);
