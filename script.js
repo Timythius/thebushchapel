@@ -993,53 +993,6 @@ function updateActiveNavigation() {
     });
 }
 
-// ============================================
-// Mobile Menu Toggle
-// ============================================
-
-function initializeMobileMenu() {
-    const nav = document.querySelector('.main-nav');
-    const header = document.querySelector('.main-header');
-
-    // Create mobile menu button if it doesn't exist
-    if (!document.querySelector('.mobile-menu-btn')) {
-        const menuBtn = document.createElement('button');
-        menuBtn.className = 'mobile-menu-btn';
-        menuBtn.innerHTML = '☰';
-        menuBtn.setAttribute('aria-label', 'Toggle navigation menu');
-        menuBtn.style.cssText = `
-            display: none;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 8px;
-        `;
-
-        menuBtn.addEventListener('click', () => {
-            nav.classList.toggle('open');
-            menuBtn.innerHTML = nav.classList.contains('open') ? '✕' : '☰';
-        });
-
-        // Insert before nav
-        header.querySelector('.header-content').insertBefore(menuBtn, nav);
-
-        // Show button on mobile
-        if (window.innerWidth <= 768) {
-            menuBtn.style.display = 'block';
-        }
-
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                menuBtn.style.display = 'none';
-                nav.classList.remove('open');
-            } else {
-                menuBtn.style.display = 'block';
-            }
-        });
-    }
-}
 
 // ============================================
 // Liturgical Calendar System (2025-2035)
@@ -1280,7 +1233,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initializeNewsletter();
     initializeScrollAnimations();
     updateActiveNavigation();
-    initializeMobileMenu();
 
     // Auto-update liturgical content
     updateHomepageForSeason();
