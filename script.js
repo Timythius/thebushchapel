@@ -1285,19 +1285,6 @@ document.addEventListener('DOMContentLoaded', () => {
         .current-season {
             position: relative;
         }
-        @media (max-width: 768px) {
-            .main-nav {
-                display: none;
-                width: 100%;
-            }
-            .main-nav.open {
-                display: block;
-            }
-            .main-nav ul {
-                flex-direction: column;
-                text-align: center;
-            }
-        }
     `;
     document.head.appendChild(style);
 });
