@@ -1218,8 +1218,21 @@ main {
         text-align: center;
     }
 
+    .main-nav {
+        width: 100%;
+        background: rgba(0,0,0,0.15);
+        border-radius: 6px;
+        padding: var(--space-xs) 0;
+    }
+
     .main-nav ul {
         justify-content: center;
+        gap: var(--space-xs);
+    }
+
+    .main-nav a {
+        font-size: 0.85rem;
+        padding: var(--space-xs) var(--space-sm);
     }
 
     .logo-section h1 {
