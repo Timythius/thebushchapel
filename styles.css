@@ -1220,7 +1220,7 @@ main {
 
     .main-nav {
         width: 100%;
-        background: rgba(0,0,0,0.2);
+        background: transparent;
         border-radius: 8px;
         padding: var(--space-xs) var(--space-sm);
         margin-top: var(--space-xs);
