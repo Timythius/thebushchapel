@@ -92,6 +92,15 @@ class CommunityBoard {
         const authTabs = document.querySelectorAll('.auth-tab');
         authTabs.forEach(tab => {
             tab.addEventListener('click', () => {
+                // If tab is already active, submit the corresponding form
+                if (tab.classList.contains('active')) {
+                    if (tab.dataset.tab === 'login') {
+                        document.getElementById('login-form').requestSubmit();
+                    } else if (tab.dataset.tab === 'register') {
+                        document.getElementById('register-form').requestSubmit();
+                    }
+                    return;
+                }
                 this.switchAuthTab(tab.dataset.tab);
             });
         });
