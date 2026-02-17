@@ -1054,80 +1054,79 @@ const liturgicalCalendar = {
         'ordinary-time': { available: false }
     },
 
+    // Parse 'YYYY-MM-DD' as local midnight (not UTC)
+    parseLocalDate(dateStr) {
+        const [y, m, d] = dateStr.split('-').map(Number);
+        return new Date(y, m - 1, d);
+    },
+
     getCurrentSeason() {
         const now = new Date();
-        const year = now.getFullYear();
-        const month = now.getMonth(); // 0-11
+        // Normalize to midnight local time for clean date comparisons
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const year = today.getFullYear();
+        const month = today.getMonth(); // 0-11
         const yearData = this.years[year];
-
-        // Season detection (debug logging disabled)
 
         if (!yearData) return 'ordinary-time';
 
-        // Get Easter and calculate related dates for THIS YEAR
-        const easter = new Date(yearData.easter);
+        // Parse dates as local midnight (not UTC)
+        const easter = this.parseLocalDate(yearData.easter);
         const ashWednesday = new Date(easter);
         ashWednesday.setDate(easter.getDate() - 46);
 
         const pentecost = new Date(easter);
         pentecost.setDate(easter.getDate() + 49);
-        const pentecostEnd = new Date(pentecost.getTime() + 7 * 24 * 60 * 60 * 1000);
+        const pentecostEnd = new Date(pentecost);
+        pentecostEnd.setDate(pentecost.getDate() + 7);
 
         // Epiphany is always Jan 6
         const epiphany = new Date(year, 0, 6);
 
-        // Get Advent for THIS year (note: Advent date is from PREVIOUS year)
-        const adventDate = new Date(yearData.advent);
+        // Get Advent for THIS year
+        const adventDate = this.parseLocalDate(yearData.advent);
 
 
         // SIMPLIFIED LOGIC: Check seasons in chronological order for the current year
         // NOTE: We only use 6 seasons - Epiphany is included in Ordinary Time
 
         // Jan 1-6: Christmas (continuation from previous year's Dec 25)
-        if (month === 0 && now.getDate() <= 6) {
-            // Detected: christmas (Jan 1-6)');
+        if (month === 0 && today.getDate() <= 6) {
             return 'christmas';
         }
 
         // Jan 7 - Ash Wednesday: Ordinary Time (includes what liturgically is Epiphany)
-        if (now > epiphany && now < ashWednesday) {
-            // Detected: ordinary-time (Jan 7 - Ash Wed, includes Epiphany)');
+        if (today > epiphany && today < ashWednesday) {
             return 'ordinary-time';
         }
 
         // Ash Wednesday - Easter: Lent
-        if (now >= ashWednesday && now < easter) {
-            // Detected: lent');
+        if (today >= ashWednesday && today < easter) {
             return 'lent';
         }
 
         // Easter - Pentecost: Easter
-        if (now >= easter && now < pentecost) {
-            // Detected: easter');
+        if (today >= easter && today < pentecost) {
             return 'easter';
         }
 
         // Pentecost week: Pentecost
-        if (now >= pentecost && now < pentecostEnd) {
-            // Detected: pentecost');
+        if (today >= pentecost && today < pentecostEnd) {
             return 'pentecost';
         }
 
         // After Pentecost - Advent: Ordinary Time (second period)
-        if (now >= pentecostEnd && now < adventDate) {
-            // Detected: ordinary-time (after Pentecost until Advent)');
+        if (today >= pentecostEnd && today < adventDate) {
             return 'ordinary-time';
         }
 
         // Advent - Dec 24: Advent
-        if (now >= adventDate && now < new Date(year, 11, 25)) {
-            // Detected: advent');
+        if (today >= adventDate && today < new Date(year, 11, 25)) {
             return 'advent';
         }
 
         // Dec 25-31: Christmas
-        if (month === 11 && now.getDate() >= 25) {
-            // Detected: christmas (Dec 25-31)');
+        if (month === 11 && today.getDate() >= 25) {
             return 'christmas';
         }
 
