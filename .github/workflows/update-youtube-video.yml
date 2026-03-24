@@ -83,33 +83,82 @@ jobs:
           echo "current_id=$CURRENT_VIDEO_ID" >> $GITHUB_OUTPUT
           echo "Current video ID: $CURRENT_VIDEO_ID"
 
-      - name: Update video embed
+      - name: Find latest liturgy PDF
+        id: find_pdf
+        run: |
+          # Find the most recently committed PDF in the repo root (by git commit date)
+          LATEST_PDF=$(git log --diff-filter=A --name-only --pretty=format: -- '*.pdf' | head -n 1)
+
+          if [ -z "$LATEST_PDF" ]; then
+            echo "No PDFs found in repo"
+            echo "pdf_found=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          echo "Latest PDF: $LATEST_PDF"
+          echo "pdf_found=true" >> $GITHUB_OUTPUT
+          echo "pdf_filename=$LATEST_PDF" >> $GITHUB_OUTPUT
+
+          # URL-encode the filename (spaces to %20)
+          PDF_URL_ENCODED=$(echo "$LATEST_PDF" | sed 's/ /%20/g')
+          echo "pdf_url_encoded=$PDF_URL_ENCODED" >> $GITHUB_OUTPUT
+
+      - name: Get current PDF references
+        id: current_pdf
+        run: |
+          # Extract current PDF filename from the download link in index.html
+          CURRENT_PDF_ENCODED=$(grep -oP 'href="\K[^"]*\.pdf' index.html | head -n 1)
+          echo "current_pdf_encoded=$CURRENT_PDF_ENCODED" >> $GITHUB_OUTPUT
+          echo "Current PDF reference: $CURRENT_PDF_ENCODED"
+
+      - name: Update video embed and PDF
         id: update_embed
         run: |
           CURRENT_ID="${{ steps.check_current.outputs.current_id }}"
           LATEST_ID="${{ steps.fetch_video.outputs.video_id }}"
+          CURRENT_PDF="${{ steps.current_pdf.outputs.current_pdf_encoded }}"
+          LATEST_PDF="${{ steps.find_pdf.outputs.pdf_url_encoded }}"
+          PDF_FOUND="${{ steps.find_pdf.outputs.pdf_found }}"
 
-          if [ "$CURRENT_ID" = "$LATEST_ID" ]; then
-            echo "Video is already up to date"
+          VIDEO_CHANGED=false
+          PDF_CHANGED=false
+
+          # Check if video needs updating
+          if [ "$CURRENT_ID" != "$LATEST_ID" ]; then
+            echo "Updating video from $CURRENT_ID to $LATEST_ID"
+            sed -i "s|youtube\.com/embed/${CURRENT_ID}|youtube.com/embed/${LATEST_ID}|g" index.html
+
+            NEW_ID=$(grep -oP 'youtube\.com/embed/\K[^"]+' index.html | head -n 1)
+            if [ "$NEW_ID" != "$LATEST_ID" ]; then
+              echo "Error: Failed to update video ID"
+              exit 1
+            fi
+            VIDEO_CHANGED=true
+          fi
+
+          # Check if PDF needs updating
+          if [ "$PDF_FOUND" = "true" ] && [ "$CURRENT_PDF" != "$LATEST_PDF" ]; then
+            echo "Updating PDF from $CURRENT_PDF to $LATEST_PDF"
+
+            # Update index.html - iframe src and download link
+            sed -i "s|gview?url=https://thebushchapel.vercel.app/${CURRENT_PDF}|gview?url=https://thebushchapel.vercel.app/${LATEST_PDF}|g" index.html
+            sed -i "s|href=\"${CURRENT_PDF}\"|href=\"${LATEST_PDF}\"|g" index.html
+
+            # Update seasons/lent.html - iframe src and download link
+            sed -i "s|gview?url=https://thebushchapel.vercel.app/${CURRENT_PDF}|gview?url=https://thebushchapel.vercel.app/${LATEST_PDF}|g" seasons/lent.html
+            sed -i "s|href=\"../${CURRENT_PDF}\"|href=\"../${LATEST_PDF}\"|g" seasons/lent.html
+
+            PDF_CHANGED=true
+          fi
+
+          if [ "$VIDEO_CHANGED" = "true" ] || [ "$PDF_CHANGED" = "true" ]; then
+            echo "updated=true" >> $GITHUB_OUTPUT
+            echo "video_changed=$VIDEO_CHANGED" >> $GITHUB_OUTPUT
+            echo "pdf_changed=$PDF_CHANGED" >> $GITHUB_OUTPUT
+          else
+            echo "No updates needed"
             echo "updated=false" >> $GITHUB_OUTPUT
-            exit 0
           fi
-
-          echo "Updating video from $CURRENT_ID to $LATEST_ID"
-
-          # Replace video ID in index.html
-          sed -i "s|youtube\.com/embed/${CURRENT_ID}|youtube.com/embed/${LATEST_ID}|g" index.html
-
-          # Verify the update was successful
-          NEW_ID=$(grep -oP 'youtube\.com/embed/\K[^"]+' index.html | head -n 1)
-
-          if [ "$NEW_ID" != "$LATEST_ID" ]; then
-            echo "Error: Failed to update video ID"
-            exit 1
-          fi
-
-          echo "updated=true" >> $GITHUB_OUTPUT
-          echo "Successfully updated video embed"
 
       - name: Commit and push changes
         if: steps.update_embed.outputs.updated == 'true'
@@ -118,9 +167,22 @@ jobs:
           git config --local user.name "bush-chapel-bot"
 
           VIDEO_TITLE="${{ steps.fetch_video.outputs.video_title }}"
+          VIDEO_CHANGED="${{ steps.update_embed.outputs.video_changed }}"
+          PDF_CHANGED="${{ steps.update_embed.outputs.pdf_changed }}"
+          PDF_NAME="${{ steps.find_pdf.outputs.pdf_filename }}"
 
-          git add index.html
-          git commit -m "[skip ci] Update latest video: $VIDEO_TITLE"
+          git add index.html seasons/lent.html
+
+          # Build commit message based on what changed
+          if [ "$VIDEO_CHANGED" = "true" ] && [ "$PDF_CHANGED" = "true" ]; then
+            COMMIT_MSG="[skip ci] Update video: $VIDEO_TITLE and PDF: $PDF_NAME"
+          elif [ "$VIDEO_CHANGED" = "true" ]; then
+            COMMIT_MSG="[skip ci] Update latest video: $VIDEO_TITLE"
+          else
+            COMMIT_MSG="[skip ci] Update liturgy PDF to: $PDF_NAME"
+          fi
+
+          git commit -m "$COMMIT_MSG"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -129,9 +191,13 @@ jobs:
         if: always()
         run: |
           if [ "${{ steps.update_embed.outputs.updated }}" = "true" ]; then
-            echo "✅ Video embed updated successfully"
-            echo "New video: ${{ steps.fetch_video.outputs.video_title }}"
-            echo "Video ID: ${{ steps.fetch_video.outputs.video_id }}"
+            echo "Updates applied:"
+            if [ "${{ steps.update_embed.outputs.video_changed }}" = "true" ]; then
+              echo "  - Video: ${{ steps.fetch_video.outputs.video_title }}"
+            fi
+            if [ "${{ steps.update_embed.outputs.pdf_changed }}" = "true" ]; then
+              echo "  - PDF: ${{ steps.find_pdf.outputs.pdf_filename }}"
+            fi
           else
-            echo "ℹ️ No update needed - video is already current"
+            echo "No updates needed - everything is current"
           fi
