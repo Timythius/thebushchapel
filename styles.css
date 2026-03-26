@@ -372,6 +372,13 @@ main {
 .season-card.special::before { background: var(--eucalyptus-blue); }
 .season-card.special:hover { border-color: var(--eucalyptus-blue); }
 
+/* Inactive season cards (no content yet) */
+.season-card.inactive {
+    opacity: 0.5;
+    cursor: default;
+    pointer-events: none;
+}
+
 /* ============================================
    Video Section
    ============================================ */
@@ -858,6 +865,33 @@ main {
     color: var(--gum-green);
     font-style: italic;
     padding: var(--space-md);
+}
+
+/* Comment Replies (localStorage comment system) */
+.replies {
+    margin-left: 24px;
+    margin-top: 12px;
+    padding-left: var(--space-md);
+    border-left: 2px solid var(--gum-green-pale);
+}
+
+.replies .comment {
+    background: var(--warm-white);
+    border-left-color: var(--gum-green-light);
+}
+
+.cancel-reply {
+    background: none;
+    border: none;
+    color: var(--terracotta);
+    cursor: pointer;
+    margin-left: 10px;
+    font-family: var(--font-body);
+    font-weight: 600;
+}
+
+.cancel-reply:hover {
+    text-decoration: underline;
 }
 
 /* ============================================
@@ -2125,6 +2159,28 @@ main {
 
 .cancel-reply-btn:hover {
     text-decoration: underline;
+}
+
+/* Reply Context (admin pending view) */
+.reply-context {
+    background: var(--sand);
+    border-left: 3px solid var(--ochre);
+    padding: var(--space-xs) var(--space-sm);
+    margin-bottom: var(--space-sm);
+    border-radius: 0 6px 6px 0;
+    font-size: 0.9rem;
+}
+
+.reply-context-label {
+    font-weight: 600;
+    color: var(--ochre);
+    display: block;
+    margin-bottom: 2px;
+}
+
+.reply-context-text {
+    color: var(--bark-brown);
+    font-style: italic;
 }
 
 /* Private Message Indicator */

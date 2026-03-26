@@ -382,10 +382,26 @@ class CommunityBoard {
         const topLevel = messages.filter(m => !m.threadId);
         const replies = messages.filter(m => m.threadId);
 
+        // Find orphaned replies (parent not in result set) and treat as top-level
+        const topLevelIds = new Set(topLevel.map(m => m.id));
+        const orphanedReplies = replies.filter(r => !topLevelIds.has(r.threadId));
+        const threadedReplies = replies.filter(r => topLevelIds.has(r.threadId));
+
         let html = '';
         topLevel.forEach(message => {
-            const messageReplies = replies.filter(r => r.threadId === message.id);
+            const messageReplies = threadedReplies
+                .filter(r => r.threadId === message.id)
+                .sort((a, b) => {
+                    const aTime = a.createdAt ? a.createdAt.toMillis() : 0;
+                    const bTime = b.createdAt ? b.createdAt.toMillis() : 0;
+                    return aTime - bTime; // oldest first within threads
+                });
             html += this.createMessageHTML(message, messageReplies);
+        });
+
+        // Render orphaned replies as standalone messages
+        orphanedReplies.forEach(message => {
+            html += this.createMessageHTML(message);
         });
 
         container.innerHTML = html;
@@ -399,10 +415,27 @@ class CommunityBoard {
     }
 
     // Render pending messages for admin
-    renderPendingMessages(messages, container) {
+    async renderPendingMessages(messages, container) {
+        // Fetch parent messages for any replies
+        const replyMessages = messages.filter(m => m.threadId);
+        const parentIds = [...new Set(replyMessages.map(m => m.threadId))];
+        const parentMap = {};
+
+        for (const parentId of parentIds) {
+            try {
+                const doc = await this.db.collection('messages').doc(parentId).get();
+                if (doc.exists) {
+                    parentMap[parentId] = doc.data();
+                }
+            } catch (e) {
+                console.error('Error fetching parent message:', e);
+            }
+        }
+
         let html = '';
         messages.forEach(message => {
-            html += this.createPendingMessageHTML(message);
+            const parent = message.threadId ? parentMap[message.threadId] : null;
+            html += this.createPendingMessageHTML(message, parent);
         });
 
         container.innerHTML = html;
@@ -465,12 +498,32 @@ class CommunityBoard {
     }
 
     // Create pending message HTML for admin
-    createPendingMessageHTML(message) {
+    createPendingMessageHTML(message, parentMessage = null) {
         const date = message.createdAt ? this.formatDate(message.createdAt.toDate()) : 'Just now';
         const privateIndicator = message.isPrivate ? '<span class="private-indicator">Private</span>' : '';
 
+        let parentContext = '';
+        if (message.threadId && parentMessage) {
+            const parentPreview = parentMessage.content.length > 120
+                ? parentMessage.content.substring(0, 120) + '...'
+                : parentMessage.content;
+            parentContext = `
+                <div class="reply-context">
+                    <span class="reply-context-label">Replying to ${escapeHTML(parentMessage.authorName)}:</span>
+                    <span class="reply-context-text">${escapeHTML(parentPreview)}</span>
+                </div>
+            `;
+        } else if (message.threadId) {
+            parentContext = `
+                <div class="reply-context">
+                    <span class="reply-context-label">Reply to a deleted message</span>
+                </div>
+            `;
+        }
+
         return `
             <div class="message pending" data-message-id="${message.id}">
+                ${parentContext}
                 <div class="message-header">
                     <span class="message-author">${escapeHTML(message.authorName)}</span>
                     <span class="message-date">${date}</span>
@@ -1252,7 +1305,7 @@ document.addEventListener('DOMContentLoaded', () => {
         communityBoard.init();
     }
 
-    // Add CSS for notifications
+    // Add CSS for notification animations
     const style = document.createElement('style');
     style.textContent = `
         @keyframes slideIn {
@@ -1262,36 +1315,6 @@ document.addEventListener('DOMContentLoaded', () => {
         @keyframes slideOut {
             from { transform: translateX(0); opacity: 1; }
             to { transform: translateX(100%); opacity: 0; }
-        }
-        .reply-form {
-            margin-top: 16px;
-            padding: 16px;
-            background: #f5f1e8;
-            border-radius: 8px;
-        }
-        .cancel-reply {
-            background: none;
-            border: none;
-            color: #9e5a3c;
-            cursor: pointer;
-            margin-left: 10px;
-            font-family: inherit;
-        }
-        .cancel-reply:hover {
-            text-decoration: underline;
-        }
-        .replies {
-            margin-left: 24px;
-            margin-top: 12px;
-            padding-left: 16px;
-            border-left: 2px solid #c8dbc6;
-        }
-        .replies .comment {
-            background: #faf8f5;
-            border-left-color: #7ba584;
-        }
-        .current-season {
-            position: relative;
         }
     `;
     document.head.appendChild(style);
