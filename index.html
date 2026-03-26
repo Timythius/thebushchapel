@@ -143,6 +143,9 @@
                         <button id="pdf-prev" disabled>Prev</button>
                         <span class="pdf-page-info" id="pdf-page-info"></span>
                         <button id="pdf-next" disabled>Next</button>
+                        <span class="pdf-controls-separator"></span>
+                        <button id="pdf-zoom-out" disabled>−</button>
+                        <button id="pdf-zoom-in">+</button>
                     </div>
                 </div>
                 <div class="pdf-download">
@@ -214,61 +217,7 @@
 
     <!-- Decorative gum leaves - bottom corners -->
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.9.155/pdf.min.mjs" type="module"></script>
-    <script type="module">
-        import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.9.155/pdf.min.mjs';
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.9.155/pdf.worker.min.mjs';
-
-        const pdfUrl = document.querySelector('.pdf-download a').getAttribute('href');
-        const wrapper = document.getElementById('pdf-canvas-wrapper');
-        const prevBtn = document.getElementById('pdf-prev');
-        const nextBtn = document.getElementById('pdf-next');
-        const pageInfo = document.getElementById('pdf-page-info');
-
-        if (wrapper && pdfUrl) {
-            let pdfDoc = null;
-            let currentPage = 1;
-
-            function renderPage(num) {
-                pdfDoc.getPage(num).then(page => {
-                    const containerWidth = wrapper.clientWidth;
-                    const unscaledViewport = page.getViewport({ scale: 1 });
-                    const scale = Math.min(containerWidth / unscaledViewport.width, 2);
-                    const viewport = page.getViewport({ scale });
-
-                    const canvas = document.createElement('canvas');
-                    canvas.width = viewport.width;
-                    canvas.height = viewport.height;
-
-                    wrapper.innerHTML = '';
-                    wrapper.appendChild(canvas);
-
-                    page.render({
-                        canvasContext: canvas.getContext('2d'),
-                        viewport: viewport
-                    });
-
-                    pageInfo.textContent = `${num} / ${pdfDoc.numPages}`;
-                    prevBtn.disabled = num <= 1;
-                    nextBtn.disabled = num >= pdfDoc.numPages;
-                });
-            }
-
-            pdfjsLib.getDocument(pdfUrl).promise.then(pdf => {
-                pdfDoc = pdf;
-                renderPage(1);
-            }).catch(() => {
-                wrapper.innerHTML = '<div class="pdf-loading">Unable to load PDF. Please use the download link below.</div>';
-            });
-
-            prevBtn.addEventListener('click', () => {
-                if (currentPage > 1) { currentPage--; renderPage(currentPage); }
-            });
-            nextBtn.addEventListener('click', () => {
-                if (pdfDoc && currentPage < pdfDoc.numPages) { currentPage++; renderPage(currentPage); }
-            });
-        }
-    </script>
+    <script type="module" src="pdf-viewer.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

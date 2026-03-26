@@ -364,6 +364,13 @@ main {
     text-align: center;
 }
 
+.pdf-controls-separator {
+    width: 1px;
+    height: 20px;
+    background: var(--sand);
+    margin: 0 var(--space-xs);
+}
+
 .pdf-loading {
     display: flex;
     align-items: center;
