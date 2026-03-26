@@ -140,12 +140,10 @@ jobs:
           if [ "$PDF_FOUND" = "true" ] && [ "$CURRENT_PDF" != "$LATEST_PDF" ]; then
             echo "Updating PDF from $CURRENT_PDF to $LATEST_PDF"
 
-            # Update index.html - iframe src and download link
-            sed -i "s|gview?url=https://thebushchapel.vercel.app/${CURRENT_PDF}|gview?url=https://thebushchapel.vercel.app/${LATEST_PDF}|g" index.html
+            # Update index.html - download link (PDF.js viewer reads from this)
             sed -i "s|href=\"${CURRENT_PDF}\"|href=\"${LATEST_PDF}\"|g" index.html
 
-            # Update seasons/lent.html - iframe src and download link
-            sed -i "s|gview?url=https://thebushchapel.vercel.app/${CURRENT_PDF}|gview?url=https://thebushchapel.vercel.app/${LATEST_PDF}|g" seasons/lent.html
+            # Update seasons/lent.html - download link (PDF.js viewer reads from this)
             sed -i "s|href=\"../${CURRENT_PDF}\"|href=\"../${LATEST_PDF}\"|g" seasons/lent.html
 
             PDF_CHANGED=true

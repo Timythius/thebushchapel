@@ -264,6 +264,110 @@ main {
 }
 
 /* ============================================
+   PDF Viewer (PDF.js)
+   ============================================ */
+.pdf-viewer-container {
+    max-width: 800px;
+    margin: 1.5rem auto;
+    padding: 0 1rem;
+}
+
+.pdf-viewer {
+    position: relative;
+    background: var(--warm-white);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.pdf-canvas-wrapper {
+    width: 100%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    display: flex;
+    justify-content: center;
+    background: #525659;
+    min-height: 400px;
+}
+
+.pdf-canvas-wrapper canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+
+.pdf-controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-xs) var(--space-sm);
+    background: var(--cream);
+    border-top: 1px solid var(--sand);
+}
+
+.pdf-controls button {
+    background: var(--gum-green);
+    color: white;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-weight: 600;
+    transition: background 0.2s ease;
+}
+
+.pdf-controls button:hover {
+    background: var(--gum-green-dark);
+}
+
+.pdf-controls button:disabled {
+    background: var(--gum-green-pale);
+    cursor: default;
+}
+
+.pdf-page-info {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: var(--bark-brown);
+    min-width: 80px;
+    text-align: center;
+}
+
+.pdf-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+    color: var(--gum-green);
+    font-style: italic;
+    font-family: var(--font-body);
+}
+
+.pdf-download {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    .pdf-canvas-wrapper {
+        min-height: 300px;
+    }
+
+    .pdf-controls {
+        gap: var(--space-xs);
+        padding: var(--space-xs);
+    }
+
+    .pdf-controls button {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+    }
+}
+
+/* ============================================
    Liturgical Calendar Grid
    ============================================ */
 .liturgical-calendar {
