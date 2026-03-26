@@ -50,6 +50,34 @@
 }
 
 /* ============================================
+   Accessibility
+   ============================================ */
+.skip-to-content {
+    position: absolute;
+    left: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    z-index: 9999;
+    background: var(--gum-green-dark);
+    color: white;
+    padding: var(--space-sm) var(--space-md);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    text-decoration: none;
+    border-radius: 0 0 8px 0;
+}
+
+.skip-to-content:focus {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: auto;
+    height: auto;
+}
+
+/* ============================================
    Base Styles
    ============================================ */
 *, *::before, *::after {
@@ -535,8 +563,9 @@ main {
 }
 
 .video-container {
-    max-width: 900px;
-    margin: 0 auto;
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 0 1rem;
 }
 
 .video-wrapper {
@@ -544,6 +573,8 @@ main {
     padding-bottom: 56.25%; /* 16:9 aspect ratio */
     height: 0;
     overflow: hidden;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
 .video-wrapper iframe {
@@ -1338,6 +1369,73 @@ main {
     margin: var(--space-md) auto;
     display: block;
     box-shadow: var(--shadow-medium);
+}
+
+/* Team Member Profiles */
+.team-heading {
+    text-align: center;
+    margin-bottom: 1.5rem;
+}
+
+.team-photo {
+    float: left;
+    width: 333px;
+    height: auto;
+    margin: 0 1.5rem 1rem 0;
+}
+
+.team-photo-caption {
+    float: left;
+    width: 333px;
+    margin: 0 1.5rem 0.5rem 0;
+    text-align: center;
+    font-style: italic;
+    color: var(--gum-green);
+    clear: left;
+}
+
+.team-link {
+    color: var(--ochre);
+}
+
+.clearfix::after {
+    content: '';
+    display: table;
+    clear: both;
+}
+
+/* Section Feature Image */
+.section-image {
+    text-align: center;
+    margin: var(--space-lg) 0;
+}
+
+.section-image img {
+    max-width: 700px;
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+}
+
+/* PDF section */
+.pdf-section {
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .team-photo {
+        float: none;
+        width: 100%;
+        max-width: 333px;
+        display: block;
+        margin: 0 auto 1rem;
+    }
+
+    .team-photo-caption {
+        float: none;
+        width: 100%;
+        margin: 0 auto 0.5rem;
+    }
 }
 
 .contact-form {
