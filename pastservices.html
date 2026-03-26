@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Past Services - The Bush Chapel</title>
+    <meta name="description" content="Browse past services from The Bush Chapel, organised by liturgical season. Gentle 15-20 minute liturgies from the Australian bush.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://thebushchapel.vercel.app/pastservices.html">
+    <meta property="og:title" content="Past Services - The Bush Chapel">
+    <meta property="og:description" content="Browse past services from The Bush Chapel, organised by liturgical season. Gentle 15-20 minute liturgies from the Australian bush.">
+    <meta property="og:image" content="https://thebushchapel.vercel.app/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <a href="#main-content" class="skip-to-content">Skip to content</a>
+
+    <!-- Fixed botanical corner decorations -->
+    <div class="botanical-corner top-left">
+        <img src="the bush chapel graphics/2.png" alt="" aria-hidden="true">
+    </div>
+    <div class="botanical-corner top-right">
+        <img src="the bush chapel graphics/7.png" alt="" aria-hidden="true">
+    </div>
+    <div class="botanical-corner bottom-left">
+        <img src="the bush chapel graphics/7.png" alt="" aria-hidden="true">
+    </div>
+    <div class="botanical-corner bottom-right">
+        <img src="the bush chapel graphics/2.png" alt="" aria-hidden="true">
+    </div>
+
+    <header class="main-header">
+        <!-- Mobile botanical decorations -->
+        <div class="mobile-botanical left">
+            <img src="the bush chapel graphics/5.png" alt="" aria-hidden="true">
+        </div>
+        <div class="mobile-botanical right">
+            <img src="the bush chapel graphics/6.png" alt="" aria-hidden="true">
+        </div>
+        <div class="header-content">
+            <div class="logo-section">
+                <h1>The Bush Chapel</h1>
+                <p class="tagline">A Service from the Australian Bush</p>
+            </div>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="pastservices.html" class="active">Past Services</a></li>
+                    <li><a href="community.html">Community</a></li>
+                    <li><a href="meettheteam.html">Meet the Team</a></li>
+                </ul>
+            </nav>
+        </div>
+        <!-- Header botanical accents -->
+        <div class="header-botanical left">
+            <img src="the bush chapel graphics/7.png" alt="" aria-hidden="true">
+        </div>
+        <div class="header-botanical right">
+            <img src="the bush chapel graphics/7.png" alt="" aria-hidden="true">
+        </div>
+    </header>
+
+    <main id="main-content">
+        <section class="welcome-section">
+            <div class="gum-border-frame">
+                <div class="welcome-content">
+                    <h1>Past Services</h1>
+                    <p>Revisit a service you missed or return to one that spoke to your heart. All our chapel gatherings are here, organised by season.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Video Player (shown when a video is selected) -->
+        <section class="archive-player" id="archive-player" style="display: none;">
+            <div class="video-container">
+                <div class="video-wrapper">
+                    <iframe id="archive-iframe" src="" title="The Bush Chapel Service" frameborder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowfullscreen></iframe>
+                </div>
+            </div>
+            <p class="archive-player-title" id="archive-player-title"></p>
+        </section>
+
+        <!-- Botanical divider -->
+        <div class="botanical-divider">
+            <img src="the bush chapel graphics/2.png" alt="" aria-hidden="true">
+            <img src="the bush chapel graphics/4.png" alt="" aria-hidden="true">
+            <img src="the bush chapel graphics/2.png" alt="" aria-hidden="true">
+        </div>
+
+        <!-- Archive Grid -->
+        <section class="archive-section">
+            <div id="archive-container">
+                <p class="archive-loading">Loading services...</p>
+            </div>
+        </section>
+    </main>
+
+    <footer class="main-footer">
+        <div class="footer-bottom">
+            <p>&copy; 2026 The Bush Chapel</p>
+        </div>
+    </footer>
+
+    <script>
+        const SEASON_LABELS = {
+            'lent': 'Lent',
+            'advent': 'Advent',
+            'christmas': 'Christmas',
+            'easter': 'Easter',
+            'pentecost': 'Pentecost',
+            'ordinary-time': 'Ordinary Time'
+        };
+
+        const SEASON_ORDER = ['lent', 'easter', 'pentecost', 'advent', 'christmas', 'ordinary-time'];
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr + 'T00:00:00');
+            return date.toLocaleDateString('en-AU', { day: 'numeric', month: 'long', year: 'numeric' });
+        }
+
+        function playVideo(videoId, title) {
+            const player = document.getElementById('archive-player');
+            const iframe = document.getElementById('archive-iframe');
+            const titleEl = document.getElementById('archive-player-title');
+
+            iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1`;
+            titleEl.textContent = title;
+            player.style.display = 'block';
+            player.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function renderArchive(data) {
+            const container = document.getElementById('archive-container');
+
+            // Group by "season year"
+            const groups = {};
+            data.videos.forEach(v => {
+                const key = `${v.season}|${v.year}`;
+                if (!groups[key]) groups[key] = { season: v.season, year: v.year, videos: [] };
+                groups[key].videos.push(v);
+            });
+
+            // Sort groups: by year desc, then by season order
+            const sortedKeys = Object.keys(groups).sort((a, b) => {
+                const ga = groups[a], gb = groups[b];
+                if (ga.year !== gb.year) return gb.year - ga.year;
+                return SEASON_ORDER.indexOf(ga.season) - SEASON_ORDER.indexOf(gb.season);
+            });
+
+            let html = '';
+            sortedKeys.forEach(key => {
+                const group = groups[key];
+                const label = `${SEASON_LABELS[group.season] || group.season} ${group.year}`;
+
+                html += `<div class="archive-group">`;
+                html += `<h2 class="archive-group-heading ${group.season}">${label}</h2>`;
+                html += `<div class="archive-grid">`;
+
+                group.videos.forEach(v => {
+                    const thumb = `https://img.youtube.com/vi/${v.id}/mqdefault.jpg`;
+                    const date = v.published ? formatDate(v.published) : '';
+                    html += `
+                        <button class="archive-card" onclick="playVideo('${v.id}', '${v.title.replace(/'/g, "\\'")}')">
+                            <img src="${thumb}" alt="${v.title}" loading="lazy">
+                            <div class="archive-card-info">
+                                <h3>${v.title}</h3>
+                                <p class="archive-card-date">${date}</p>
+                            </div>
+                        </button>
+                    `;
+                });
+
+                html += `</div></div>`;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // Load and render
+        fetch('videos.json')
+            .then(r => r.json())
+            .then(renderArchive)
+            .catch(() => {
+                document.getElementById('archive-container').innerHTML =
+                    '<p class="archive-loading">Unable to load services. Please try refreshing the page.</p>';
+            });
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -158,8 +158,104 @@ jobs:
             echo "updated=false" >> $GITHUB_OUTPUT
           fi
 
+      - name: Update video archive
+        id: update_archive
+        run: |
+          CHANNEL_ID="UC4LfSjlnX99HNzV3e87xpjA"
+          RSS_URL="https://www.youtube.com/feeds/videos.xml?channel_id=$CHANNEL_ID"
+          RSS_CONTENT=$(curl -sSL --max-time 30 "$RSS_URL" 2>/dev/null || echo "")
+
+          if [ -z "$RSS_CONTENT" ]; then
+            echo "Could not fetch RSS for archive update"
+            echo "archive_changed=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          # Write RSS to temp file for Python to read
+          echo "$RSS_CONTENT" > /tmp/rss_feed.xml
+
+          python3 << 'PYEOF'
+          import json, re, sys
+
+          # Read RSS feed from temp file
+          with open('/tmp/rss_feed.xml', 'r') as f:
+              rss = f.read()
+
+          # Parse video entries from RSS
+          entries = re.findall(
+              r'<yt:videoId>([^<]+)</yt:videoId>.*?<title>([^<]+)</title>.*?<published>([^<]+)</published>',
+              rss, re.DOTALL
+          )
+
+          # Load existing archive
+          try:
+              with open('videos.json', 'r') as f:
+                  archive = json.load(f)
+          except:
+              archive = {'lastUpdated': '', 'videos': []}
+
+          existing_ids = {v['id'] for v in archive['videos']}
+          new_videos = []
+
+          for vid_id, title, pub_date in entries:
+              if vid_id in existing_ids:
+                  continue
+
+              # Clean title
+              t = title.strip()
+              for prefix in ['The Bush Chapel - ', 'The Bush Chapel -  ', 'The Bush Chapel -']:
+                  if t.startswith(prefix):
+                      t = t[len(prefix):]
+              t = t.rstrip('.').strip()
+
+              # Detect season
+              tl = title.lower()
+              if 'lent' in tl or 'passion' in tl:
+                  season = 'lent'
+              elif 'advent' in tl:
+                  season = 'advent'
+              elif 'christmas' in tl:
+                  season = 'christmas'
+              elif 'easter' in tl:
+                  season = 'easter'
+              elif 'pentecost' in tl:
+                  season = 'pentecost'
+              else:
+                  season = 'ordinary-time'
+
+              date = pub_date[:10]
+              year = int(date[:4])
+
+              new_videos.append({
+                  'id': vid_id,
+                  'title': t,
+                  'published': date,
+                  'season': season,
+                  'year': year
+              })
+
+          if new_videos:
+              # Insert new videos at the beginning (newest first)
+              archive['videos'] = new_videos + archive['videos']
+              archive['lastUpdated'] = new_videos[0]['published']
+
+              with open('videos.json', 'w') as f:
+                  json.dump(archive, f, indent=2)
+
+              print(f"Added {len(new_videos)} new video(s) to archive")
+              with open('/tmp/archive_changed', 'w') as f:
+                  f.write('true')
+          else:
+              print("No new videos for archive")
+              with open('/tmp/archive_changed', 'w') as f:
+                  f.write('false')
+          PYEOF
+
+          ARCHIVE_CHANGED=$(cat /tmp/archive_changed 2>/dev/null || echo "false")
+          echo "archive_changed=$ARCHIVE_CHANGED" >> $GITHUB_OUTPUT
+
       - name: Commit and push changes
-        if: steps.update_embed.outputs.updated == 'true'
+        if: steps.update_embed.outputs.updated == 'true' || steps.update_archive.outputs.archive_changed == 'true'
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "bush-chapel-bot"
@@ -168,17 +264,25 @@ jobs:
           VIDEO_CHANGED="${{ steps.update_embed.outputs.video_changed }}"
           PDF_CHANGED="${{ steps.update_embed.outputs.pdf_changed }}"
           PDF_NAME="${{ steps.find_pdf.outputs.pdf_filename }}"
+          ARCHIVE_CHANGED="${{ steps.update_archive.outputs.archive_changed }}"
 
-          git add index.html seasons/lent.html
+          git add index.html seasons/lent.html videos.json
 
           # Build commit message based on what changed
-          if [ "$VIDEO_CHANGED" = "true" ] && [ "$PDF_CHANGED" = "true" ]; then
-            COMMIT_MSG="[skip ci] Update video: $VIDEO_TITLE and PDF: $PDF_NAME"
-          elif [ "$VIDEO_CHANGED" = "true" ]; then
-            COMMIT_MSG="[skip ci] Update latest video: $VIDEO_TITLE"
-          else
-            COMMIT_MSG="[skip ci] Update liturgy PDF to: $PDF_NAME"
+          PARTS=""
+          if [ "$VIDEO_CHANGED" = "true" ]; then
+            PARTS="video: $VIDEO_TITLE"
           fi
+          if [ "$PDF_CHANGED" = "true" ]; then
+            [ -n "$PARTS" ] && PARTS="$PARTS, "
+            PARTS="${PARTS}PDF: $PDF_NAME"
+          fi
+          if [ "$ARCHIVE_CHANGED" = "true" ]; then
+            [ -n "$PARTS" ] && PARTS="$PARTS, "
+            PARTS="${PARTS}archive"
+          fi
+
+          COMMIT_MSG="[skip ci] Update $PARTS"
 
           git commit -m "$COMMIT_MSG"
           git push

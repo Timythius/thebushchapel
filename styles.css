@@ -612,6 +612,114 @@ main {
     color: var(--bark-brown);
 }
 
+/* ============================================
+   Past Services Archive
+   ============================================ */
+.archive-section {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 var(--space-sm);
+}
+
+.archive-loading {
+    text-align: center;
+    padding: var(--space-lg);
+    color: var(--gum-green);
+    font-style: italic;
+}
+
+.archive-player {
+    margin-bottom: var(--space-md);
+}
+
+.archive-player-title {
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 1.3rem;
+    color: var(--gum-green-dark);
+    margin-top: var(--space-sm);
+    font-weight: 600;
+}
+
+.archive-group {
+    margin-bottom: var(--space-lg);
+}
+
+.archive-group-heading {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    color: var(--gum-green-dark);
+    padding-bottom: var(--space-xs);
+    margin-bottom: var(--space-md);
+    border-bottom: 3px solid var(--gum-green-pale);
+}
+
+.archive-group-heading.lent { border-bottom-color: var(--lent-purple); }
+.archive-group-heading.advent { border-bottom-color: var(--advent-purple); }
+.archive-group-heading.christmas { border-bottom-color: var(--christmas-gold); }
+.archive-group-heading.easter { border-bottom-color: var(--christmas-gold); }
+.archive-group-heading.pentecost { border-bottom-color: var(--pentecost-red); }
+.archive-group-heading.ordinary-time { border-bottom-color: var(--ordinary-green); }
+
+.archive-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--space-md);
+}
+
+.archive-card {
+    background: var(--cream);
+    border: none;
+    border-radius: 8px;
+    overflow: hidden;
+    cursor: pointer;
+    text-align: left;
+    box-shadow: var(--shadow-soft);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    padding: 0;
+    font-family: var(--font-body);
+}
+
+.archive-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-medium);
+}
+
+.archive-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.archive-card-info {
+    padding: var(--space-sm);
+}
+
+.archive-card-info h3 {
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+    color: var(--gum-green-dark);
+    margin-bottom: 4px;
+    line-height: 1.3;
+}
+
+.archive-card-date {
+    font-size: 0.85rem;
+    color: var(--gum-green);
+    margin: 0;
+}
+
+@media (max-width: 768px) {
+    .archive-grid {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: var(--space-sm);
+    }
+
+    .archive-group-heading {
+        font-size: 1.3rem;
+    }
+}
+
 .view-more {
     display: inline-block;
     color: var(--ochre);
