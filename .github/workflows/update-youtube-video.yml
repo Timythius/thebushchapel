@@ -30,23 +30,26 @@ jobs:
           RSS_URL="https://www.youtube.com/feeds/videos.xml?channel_id=$CHANNEL_ID"
 
           # Fetch RSS feed with retries
-          MAX_RETRIES=3
+          MAX_RETRIES=5
           RETRY_COUNT=0
 
           while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
-            RSS_CONTENT=$(curl -sSL --max-time 30 "$RSS_URL" 2>/dev/null || echo "")
+            RSS_CONTENT=$(curl -sSL --max-time 30 \
+              -H "User-Agent: Mozilla/5.0 (compatible; BushChapelBot/1.0)" \
+              "$RSS_URL" 2>/dev/null || echo "")
 
-            if [ -n "$RSS_CONTENT" ]; then
+            # Verify we got actual RSS XML, not an HTML error/consent page
+            if echo "$RSS_CONTENT" | grep -q '<yt:videoId>'; then
               break
             fi
 
             RETRY_COUNT=$((RETRY_COUNT + 1))
-            echo "Retry $RETRY_COUNT/$MAX_RETRIES..."
-            sleep $((RETRY_COUNT * 2))  # Exponential backoff
+            echo "Retry $RETRY_COUNT/$MAX_RETRIES (response was empty or not valid RSS)..."
+            sleep $((RETRY_COUNT * 3))
           done
 
-          if [ -z "$RSS_CONTENT" ]; then
-            echo "Error: Failed to fetch RSS feed after $MAX_RETRIES retries"
+          if ! echo "$RSS_CONTENT" | grep -q '<yt:videoId>'; then
+            echo "Error: Failed to fetch valid RSS feed after $MAX_RETRIES retries"
             exit 1
           fi
 
@@ -163,10 +166,12 @@ jobs:
         run: |
           CHANNEL_ID="UC4LfSjlnX99HNzV3e87xpjA"
           RSS_URL="https://www.youtube.com/feeds/videos.xml?channel_id=$CHANNEL_ID"
-          RSS_CONTENT=$(curl -sSL --max-time 30 "$RSS_URL" 2>/dev/null || echo "")
+          RSS_CONTENT=$(curl -sSL --max-time 30 \
+            -H "User-Agent: Mozilla/5.0 (compatible; BushChapelBot/1.0)" \
+            "$RSS_URL" 2>/dev/null || echo "")
 
-          if [ -z "$RSS_CONTENT" ]; then
-            echo "Could not fetch RSS for archive update"
+          if ! echo "$RSS_CONTENT" | grep -q '<yt:videoId>'; then
+            echo "Could not fetch valid RSS for archive update"
             echo "archive_changed=false" >> $GITHUB_OUTPUT
             exit 0
           fi
