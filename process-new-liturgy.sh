@@ -45,8 +45,14 @@ echo "$(date): Found new PDF: $FILENAME" >> "$LOG"
 
 cd "$REPO"
 
-# Pull latest changes first
-git pull origin main >> "$LOG" 2>&1
+# Stash any local changes so pull can proceed cleanly
+git stash --quiet 2>/dev/null || true
+
+# Pull latest changes first (rebase to avoid merge conflicts with CI commits)
+git pull --rebase origin main >> "$LOG" 2>&1
+
+# Restore any stashed changes
+git stash pop --quiet 2>/dev/null || true
 
 # Copy the newest PDF to the repo
 cp "$NEWEST_PDF" "$REPO/$FILENAME"
