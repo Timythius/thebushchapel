@@ -49,8 +49,8 @@ jobs:
           done
 
           if ! echo "$RSS_CONTENT" | grep -q '<yt:videoId>'; then
-            echo "Error: Failed to fetch valid RSS feed after $MAX_RETRIES retries"
-            exit 1
+            echo "YouTube RSS temporarily unavailable — will retry next run"
+            exit 0
           fi
 
           # Extract latest video ID from XML
