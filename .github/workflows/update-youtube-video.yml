@@ -146,9 +146,6 @@ jobs:
             # Update index.html - download link (PDF.js viewer reads from this)
             sed -i "s|href=\"${CURRENT_PDF}\"|href=\"${LATEST_PDF}\"|g" index.html
 
-            # Update seasons/lent.html - download link (PDF.js viewer reads from this)
-            sed -i "s|href=\"../${CURRENT_PDF}\"|href=\"../${LATEST_PDF}\"|g" seasons/lent.html
-
             PDF_CHANGED=true
           fi
 
@@ -271,7 +268,7 @@ jobs:
           PDF_NAME="${{ steps.find_pdf.outputs.pdf_filename }}"
           ARCHIVE_CHANGED="${{ steps.update_archive.outputs.archive_changed }}"
 
-          git add index.html seasons/lent.html videos.json
+          git add index.html videos.json
 
           # Build commit message based on what changed
           PARTS=""
