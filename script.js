@@ -1101,11 +1101,16 @@ const liturgicalCalendar = {
             description: '',
             pdfUrl: 'liturgies/advent-liturgy.pdf'
         },
-        christmas: { available: false },
-        easter: { available: false },
-        pentecost: { available: false },
-        'ordinary-time': { available: false }
+        christmas: {},
+        easter: {},
+        pentecost: {},
+        'ordinary-time': {}
     },
+
+    // Content production began from Lent 2026 (Ash Wednesday).
+    // Seasons auto-activate when their start date passes on or after this date.
+    // Seasons before this date need available: true to be active (e.g. Advent).
+    contentStartDate: '2026-02-18',
 
     // Parse 'YYYY-MM-DD' as local midnight (not UTC)
     parseLocalDate(dateStr) {
@@ -1114,11 +1119,18 @@ const liturgicalCalendar = {
     },
 
     getCurrentSeason() {
+        // Use Melbourne, Australia timezone for consistent season detection
         const now = new Date();
-        // Normalize to midnight local time for clean date comparisons
-        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-        const year = today.getFullYear();
-        const month = today.getMonth(); // 0-11
+        const parts = new Intl.DateTimeFormat('en-AU', {
+            timeZone: 'Australia/Melbourne',
+            year: 'numeric', month: 'numeric', day: 'numeric'
+        }).formatToParts(now);
+        const melbYear = parseInt(parts.find(p => p.type === 'year').value);
+        const melbMonth = parseInt(parts.find(p => p.type === 'month').value) - 1; // 0-indexed
+        const melbDay = parseInt(parts.find(p => p.type === 'day').value);
+        const today = new Date(melbYear, melbMonth, melbDay);
+        const year = melbYear;
+        const month = melbMonth;
         const yearData = this.years[year];
 
         if (!yearData) return 'ordinary-time';
@@ -1196,6 +1208,68 @@ const liturgicalCalendar = {
 
         // Rotate array to start with current season, then flow in calendar order
         return [...seasons.slice(currentIndex), ...seasons.slice(0, currentIndex)];
+    },
+
+    // Returns a Set of season keys that should have active (clickable) tiles.
+    // A season activates when its start date passes, but only for start dates
+    // on or after contentStartDate. Seasons with available: true are always active.
+    getActivatedSeasons() {
+        const now = new Date();
+        const parts = new Intl.DateTimeFormat('en-AU', {
+            timeZone: 'Australia/Melbourne',
+            year: 'numeric', month: 'numeric', day: 'numeric'
+        }).formatToParts(now);
+        const todayYear = parseInt(parts.find(p => p.type === 'year').value);
+        const todayMonth = parseInt(parts.find(p => p.type === 'month').value) - 1;
+        const todayDay = parseInt(parts.find(p => p.type === 'day').value);
+        const today = new Date(todayYear, todayMonth, todayDay);
+
+        const contentStart = this.parseLocalDate(this.contentStartDate);
+        const activated = new Set();
+
+        // Seasons explicitly marked available are always active (e.g. Advent)
+        for (const [season, config] of Object.entries(this.content)) {
+            if (config.available === true) {
+                activated.add(season);
+            }
+        }
+
+        // Auto-activate seasons whose start date has passed and is on or after contentStartDate
+        for (const yearStr of Object.keys(this.years)) {
+            const y = parseInt(yearStr);
+            const yearData = this.years[y];
+            const easter = this.parseLocalDate(yearData.easter);
+            const adventDate = this.parseLocalDate(yearData.advent);
+
+            const ashWednesday = new Date(easter);
+            ashWednesday.setDate(easter.getDate() - 46);
+
+            const pentecost = new Date(easter);
+            pentecost.setDate(easter.getDate() + 49);
+
+            const pentecostEnd = new Date(pentecost);
+            pentecostEnd.setDate(pentecost.getDate() + 7);
+
+            // Ordinary Time has two periods per year (post-Epiphany and post-Pentecost)
+            const seasonStarts = {
+                'advent': [adventDate],
+                'christmas': [new Date(adventDate.getFullYear(), 11, 25)],
+                'ordinary-time': [new Date(y, 0, 7), pentecostEnd],
+                'lent': [ashWednesday],
+                'easter': [easter],
+                'pentecost': [pentecost]
+            };
+
+            for (const [season, startDates] of Object.entries(seasonStarts)) {
+                for (const startDate of startDates) {
+                    if (startDate >= contentStart && today >= startDate) {
+                        activated.add(season);
+                    }
+                }
+            }
+        }
+
+        return activated;
     }
 };
 
@@ -1240,7 +1314,7 @@ function rotateSeasonsGrid() {
 
     const currentSeason = liturgicalCalendar.getCurrentSeason();
     const seasonOrder = liturgicalCalendar.getSeasonOrder();
-
+    const activatedSeasons = liturgicalCalendar.getActivatedSeasons();
 
     // Get all season cards
     const cards = {
@@ -1255,10 +1329,17 @@ function rotateSeasonsGrid() {
     // Clear the grid
     seasonsGrid.innerHTML = '';
 
-    // Re-add cards in new order
+    // Re-add cards in new order, toggling active/inactive
     seasonOrder.forEach((seasonKey, index) => {
         const card = cards[seasonKey];
         if (!card) return;
+
+        // Tile is active if the season has been activated (date-based or has content)
+        if (activatedSeasons.has(seasonKey)) {
+            card.classList.remove('inactive');
+        } else {
+            card.classList.add('inactive');
+        }
 
         // Add "Current Season" label to first card
         if (index === 0) {
