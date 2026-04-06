@@ -1094,13 +1094,7 @@ const liturgicalCalendar = {
             description: '',
             pdfUrl: 'liturgies/lent-liturgy.pdf'
         },
-        advent: {
-            available: true,
-            videoId: 'DAB7XcuyvOA',
-            title: 'Advent Liturgy',
-            description: '',
-            pdfUrl: 'liturgies/advent-liturgy.pdf'
-        },
+        advent: {},
         christmas: {},
         easter: {},
         pentecost: {},
