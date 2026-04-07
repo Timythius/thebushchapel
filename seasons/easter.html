@@ -69,6 +69,30 @@
                 Easter is a joyful season celebrating Jesus' resurrection, when light and life break through, reminding us that love and hope are stronger than death.
             </p>
         </header>
+
+        <!-- Follow Along PDF Section -->
+        <section class="pdf-section">
+            <h2>Follow Along</h2>
+            <p class="section-intro">View liturgy or print PDF</p>
+            <div class="pdf-viewer-container">
+                <div class="pdf-viewer">
+                    <div class="pdf-canvas-wrapper" id="pdf-canvas-wrapper">
+                        <div class="pdf-loading">Loading liturgy...</div>
+                    </div>
+                    <div class="pdf-controls">
+                        <button id="pdf-prev" disabled>Prev</button>
+                        <span class="pdf-page-info" id="pdf-page-info"></span>
+                        <button id="pdf-next" disabled>Next</button>
+                        <span class="pdf-controls-separator"></span>
+                        <button id="pdf-zoom-out" disabled>−</button>
+                        <button id="pdf-zoom-in">+</button>
+                    </div>
+                </div>
+                <div class="pdf-download">
+                    <a href="../Easter%202.pdf" download class="cta-button">Download PDF</a>
+                </div>
+            </div>
+        </section>
     </main>
 
     <footer class="main-footer">
@@ -77,7 +101,7 @@
         </div>
     </footer>
 
-
+    <script type="module" src="../pdf-viewer.js"></script>
     <script src="../script.js"></script>
 </body>
 </html>
