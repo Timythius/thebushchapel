@@ -77,7 +77,7 @@
             <div class="pdf-viewer-container">
                 <div class="pdf-viewer">
                     <div class="pdf-canvas-wrapper" id="pdf-canvas-wrapper">
-                        <div class="pdf-loading">PDF coming</div>
+                        <div class="pdf-loading">Loading liturgy...</div>
                     </div>
                     <div class="pdf-controls">
                         <button id="pdf-prev" disabled>Prev</button>
@@ -88,8 +88,8 @@
                         <button id="pdf-zoom-in">+</button>
                     </div>
                 </div>
-                <div class="pdf-download" id="pdf-download-wrap" style="display:none">
-                    <a href="../Easter%202.pdf" download class="cta-button">Download PDF</a>
+                <div class="pdf-download">
+                    <a href="../Easter%20Sunday.pdf" download class="cta-button">Download PDF</a>
                 </div>
             </div>
         </section>
@@ -101,7 +101,7 @@
         </div>
     </footer>
 
-    <!-- pdf-viewer.js added by deploy script when PDF is ready -->
+    <script type="module" src="../pdf-viewer.js"></script>
     <script src="../script.js"></script>
 </body>
 </html>
