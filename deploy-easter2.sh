@@ -49,9 +49,10 @@ echo "$(date): Copied $PDF_NAME to repo" >> "$LOG"
 # Update index.html - change Easter Sunday.pdf to Easter 2.pdf
 sed -i '' 's|Easter%20Sunday\.pdf|Easter%202.pdf|g' index.html
 
-# Show the download button and restore loading text on Easter page
+# Show the download button, restore loading text, and enable PDF viewer on Easter page
 sed -i '' 's|style="display:none"||' seasons/easter.html
 sed -i '' 's|PDF coming|Loading liturgy...|' seasons/easter.html
+sed -i '' 's|<!-- pdf-viewer.js added by deploy script when PDF is ready -->|<script type="module" src="../pdf-viewer.js"></script>|' seasons/easter.html
 
 # Stage, commit, and push
 git add "$PDF_NAME" index.html seasons/easter.html
