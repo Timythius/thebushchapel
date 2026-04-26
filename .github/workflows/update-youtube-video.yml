@@ -73,9 +73,6 @@ jobs:
           # Extract video title for commit message
           VIDEO_TITLE=$(echo "$RSS_CONTENT" | grep -oP '<title>\K[^<]+' | sed -n '2p' | sed 's/&amp;/\&/g; s/&lt;/</g; s/&gt;/>/g; s/&quot;/"/g; s/&#39;/'\''/g')
 
-          # Escape single quotes for shell
-          VIDEO_TITLE=$(echo "$VIDEO_TITLE" | sed "s/'/'\"'\"'/g")
-
           echo "video_title=$VIDEO_TITLE" >> $GITHUB_OUTPUT
           echo "Video title: $VIDEO_TITLE"
 
@@ -215,13 +212,14 @@ jobs:
 
       - name: Commit and push changes
         if: steps.update_embed.outputs.updated == 'true' || steps.update_archive.outputs.archive_changed == 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VIDEO_TITLE: ${{ steps.fetch_video.outputs.video_title }}
+          VIDEO_CHANGED: ${{ steps.update_embed.outputs.video_changed }}
+          ARCHIVE_CHANGED: ${{ steps.update_archive.outputs.archive_changed }}
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "bush-chapel-bot"
-
-          VIDEO_TITLE="${{ steps.fetch_video.outputs.video_title }}"
-          VIDEO_CHANGED="${{ steps.update_embed.outputs.video_changed }}"
-          ARCHIVE_CHANGED="${{ steps.update_archive.outputs.archive_changed }}"
 
           git add index.html videos.json
 
@@ -239,16 +237,18 @@ jobs:
 
           git commit -m "$COMMIT_MSG"
           git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Summary
         if: always()
+        env:
+          UPDATED: ${{ steps.update_embed.outputs.updated }}
+          VIDEO_CHANGED: ${{ steps.update_embed.outputs.video_changed }}
+          VIDEO_TITLE: ${{ steps.fetch_video.outputs.video_title }}
         run: |
-          if [ "${{ steps.update_embed.outputs.updated }}" = "true" ]; then
+          if [ "$UPDATED" = "true" ]; then
             echo "Updates applied:"
-            if [ "${{ steps.update_embed.outputs.video_changed }}" = "true" ]; then
-              echo "  - Video: ${{ steps.fetch_video.outputs.video_title }}"
+            if [ "$VIDEO_CHANGED" = "true" ]; then
+              echo "  - Video: $VIDEO_TITLE"
             fi
           else
             echo "No updates needed - everything is current"
