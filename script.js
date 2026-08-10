@@ -1085,15 +1085,21 @@ const liturgicalCalendar = {
         2035: { easter: '2035-03-25', advent: '2034-12-02' }
     },
 
-    // Which seasons have content. `available: true` keeps a season's tile
-    // clickable regardless of date (see getActivatedSeasons).
+    // Which seasons have content (see getActivatedSeasons).
+    //   available: true   tile stays clickable regardless of date
+    //   available: false  tile stays dimmed regardless of date
+    //   omitted           tile activates when the season's start date passes
     content: {
         lent: {
             available: true
         },
+        easter: {
+            // The Easter page has no content yet, so don't send visitors there.
+            // Remove this to let it activate on its own date again.
+            available: false
+        },
         advent: {},
         christmas: {},
-        easter: {},
         pentecost: {},
         'ordinary-time': {}
     },
@@ -1262,6 +1268,14 @@ const liturgicalCalendar = {
                         activated.add(season);
                     }
                 }
+            }
+        }
+
+        // available: false wins over date-based activation — applied last so a
+        // season with no content stays dimmed even once its start date passes.
+        for (const [season, config] of Object.entries(this.content)) {
+            if (config.available === false) {
+                activated.delete(season);
             }
         }
 
