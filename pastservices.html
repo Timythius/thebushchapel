@@ -119,7 +119,10 @@
             'ordinary-time': 'Ordinary Time'
         };
 
-        const SEASON_ORDER = ['lent', 'easter', 'pentecost', 'advent', 'christmas', 'ordinary-time'];
+        // Chronological order within a calendar year. Ordinary Time runs from the
+        // week after Pentecost to the week before Advent, so it sits fourth — not
+        // last, which made the page jump from December back to May.
+        const SEASON_ORDER = ['lent', 'easter', 'pentecost', 'ordinary-time', 'advent', 'christmas'];
 
         function formatDate(dateStr) {
             const date = new Date(dateStr + 'T00:00:00');
@@ -164,7 +167,11 @@
                 html += `<h2 class="archive-group-heading ${group.season}">${label}</h2>`;
                 html += `<div class="archive-grid">`;
 
-                group.videos.forEach(v => {
+                // videos.json is newest-first, but a past season is a progression:
+                // Lent Week 1 should precede Palm Sunday, not follow it.
+                const ordered = [...group.videos].sort((a, b) => a.published.localeCompare(b.published));
+
+                ordered.forEach(v => {
                     const thumb = `https://img.youtube.com/vi/${v.id}/mqdefault.jpg`;
                     const date = v.published ? formatDate(v.published) : '';
                     html += `
