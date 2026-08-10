@@ -1139,8 +1139,13 @@ const liturgicalCalendar = {
         // Epiphany is always Jan 6
         const epiphany = new Date(year, 0, 6);
 
-        // Get Advent for THIS year
-        const adventDate = this.parseLocalDate(yearData.advent);
+        // The Advent falling in THIS calendar year. years[Y].advent is keyed by
+        // liturgical year, so it holds the Advent of November Y-1 — the one that
+        // starts this calendar year lives under years[year + 1].
+        const nextYearData = this.years[year + 1];
+        const adventDate = nextYearData
+            ? this.parseLocalDate(nextYearData.advent)
+            : new Date(year, 11, 25); // past the table: treat Dec 25 as the boundary
 
 
         // SIMPLIFIED LOGIC: Check seasons in chronological order for the current year
