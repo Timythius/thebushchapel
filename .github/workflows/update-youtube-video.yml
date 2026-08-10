@@ -2,8 +2,10 @@ name: Update Latest YouTube Video
 
 on:
   schedule:
-    # Run every 15 minutes
-    - cron: '*/15 * * * *'
+    # Hourly. The channel posts about weekly, so this is still far more often
+    # than needed — and polling harder gets us rate-limited by YouTube, which
+    # is what makes the RSS fetch fail.
+    - cron: '0 * * * *'
   workflow_dispatch:  # Allow manual triggering for testing
 
 permissions:
@@ -50,8 +52,16 @@ jobs:
 
           if ! echo "$RSS_CONTENT" | grep -q '<yt:videoId>'; then
             echo "YouTube RSS temporarily unavailable — will retry next run"
+            # NOTE: this exit only ends *this step*, not the job. Downstream steps
+            # are gated on rss_ok so they cannot run with an empty video_id.
+            echo "rss_ok=false" >> $GITHUB_OUTPUT
             exit 0
           fi
+
+          echo "rss_ok=true" >> $GITHUB_OUTPUT
+
+          # Save the feed so later steps reuse it instead of re-fetching
+          printf '%s' "$RSS_CONTENT" > /tmp/rss_feed.xml
 
           # Extract latest video ID from XML
           LATEST_VIDEO_ID=$(echo "$RSS_CONTENT" | grep -oP '<yt:videoId>\K[^<]+' | head -n 1)
@@ -78,6 +88,7 @@ jobs:
 
       - name: Check current video ID
         id: check_current
+        if: steps.fetch_video.outputs.rss_ok == 'true'
         run: |
           CURRENT_VIDEO_ID=$(grep -oP 'youtube\.com/embed/\K[^"]+' index.html | head -n 1)
           echo "current_id=$CURRENT_VIDEO_ID" >> $GITHUB_OUTPUT
@@ -85,20 +96,28 @@ jobs:
 
       - name: Update video embed
         id: update_embed
+        if: steps.fetch_video.outputs.rss_ok == 'true'
         run: |
           CURRENT_ID="${{ steps.check_current.outputs.current_id }}"
           LATEST_ID="${{ steps.fetch_video.outputs.video_id }}"
+
+          # Never write an empty or malformed ID into the embed
+          if ! echo "$LATEST_ID" | grep -qE '^[A-Za-z0-9_-]{11}$'; then
+            echo "Error: refusing to write invalid video ID: '$LATEST_ID'"
+            exit 1
+          fi
 
           VIDEO_CHANGED=false
 
           # Check if video needs updating
           if [ "$CURRENT_ID" != "$LATEST_ID" ]; then
-            echo "Updating video from $CURRENT_ID to $LATEST_ID"
-            sed -i "s|youtube\.com/embed/${CURRENT_ID}|youtube.com/embed/${LATEST_ID}|g" index.html
+            echo "Updating video from '$CURRENT_ID' to '$LATEST_ID'"
+            # Match the whole ID slot ([^"]*) so this also repairs a blanked embed
+            sed -i "s|youtube\.com/embed/[^\"]*|youtube.com/embed/${LATEST_ID}|g" index.html
 
             NEW_ID=$(grep -oP 'youtube\.com/embed/\K[^"]+' index.html | head -n 1)
             if [ "$NEW_ID" != "$LATEST_ID" ]; then
-              echo "Error: Failed to update video ID"
+              echo "Error: Failed to update video ID (got '$NEW_ID')"
               exit 1
             fi
             VIDEO_CHANGED=true
@@ -114,21 +133,14 @@ jobs:
 
       - name: Update video archive
         id: update_archive
+        if: steps.fetch_video.outputs.rss_ok == 'true'
         run: |
-          CHANNEL_ID="UC4LfSjlnX99HNzV3e87xpjA"
-          RSS_URL="https://www.youtube.com/feeds/videos.xml?channel_id=$CHANNEL_ID"
-          RSS_CONTENT=$(curl -sSL --max-time 30 \
-            -H "User-Agent: Mozilla/5.0 (compatible; BushChapelBot/1.0)" \
-            "$RSS_URL" 2>/dev/null || echo "")
-
-          if ! echo "$RSS_CONTENT" | grep -q '<yt:videoId>'; then
-            echo "Could not fetch valid RSS for archive update"
+          # Reuses the feed saved by the fetch step — no second request
+          if ! grep -q '<yt:videoId>' /tmp/rss_feed.xml 2>/dev/null; then
+            echo "No valid RSS available for archive update"
             echo "archive_changed=false" >> $GITHUB_OUTPUT
             exit 0
           fi
-
-          # Write RSS to temp file for Python to read
-          echo "$RSS_CONTENT" > /tmp/rss_feed.xml
 
           python3 << 'PYEOF'
           import json, re, sys
