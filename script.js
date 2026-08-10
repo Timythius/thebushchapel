@@ -1093,15 +1093,19 @@ const liturgicalCalendar = {
         lent: {
             available: true
         },
+        // These pages are a header and description only, so don't send visitors
+        // there. Remove a season's flag to let it activate on its own date again.
         easter: {
-            // The Easter page has no content yet, so don't send visitors there.
-            // Remove this to let it activate on its own date again.
+            available: false
+        },
+        pentecost: {
+            available: false
+        },
+        'ordinary-time': {
             available: false
         },
         advent: {},
-        christmas: {},
-        pentecost: {},
-        'ordinary-time': {}
+        christmas: {}
     },
 
     // Content production began from Lent 2026 (Ash Wednesday).
