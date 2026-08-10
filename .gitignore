@@ -1,2 +1,5 @@
 process-liturgy.log
 *.command
+
+# macOS
+.DS_Store

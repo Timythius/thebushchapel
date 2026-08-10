@@ -1085,14 +1085,11 @@ const liturgicalCalendar = {
         2035: { easter: '2035-03-25', advent: '2034-12-02' }
     },
 
-    // Video/content availability for each season
+    // Which seasons have content. `available: true` keeps a season's tile
+    // clickable regardless of date (see getActivatedSeasons).
     content: {
         lent: {
-            available: true,
-            videoId: 'DAB7XcuyvOA',
-            title: 'Lent Liturgy',
-            description: '',
-            pdfUrl: 'liturgies/lent-liturgy.pdf'
+            available: true
         },
         advent: {},
         christmas: {},
@@ -1267,41 +1264,6 @@ const liturgicalCalendar = {
     }
 };
 
-// ============================================
-// Auto-update Homepage Content
-// ============================================
-
-function updateHomepageForSeason() {
-    const season = liturgicalCalendar.getCurrentSeason();
-    const seasonContent = liturgicalCalendar.content[season];
-    const videoSection = document.querySelector('.latest-video');
-
-    if (!videoSection) return;
-
-    if (!seasonContent || !seasonContent.available) {
-        // Hide video section if no content available
-        videoSection.style.display = 'none';
-        return;
-    }
-
-    // Update video section with current season content
-    videoSection.style.display = 'block';
-
-    const iframe = videoSection.querySelector('iframe');
-    const title = videoSection.querySelector('.video-info h3');
-    const description = videoSection.querySelector('.video-description');
-    const pdfLink = videoSection.querySelector('.view-more');
-
-    if (iframe) {
-        iframe.src = `https://www.youtube.com/embed/${seasonContent.videoId}`;
-        iframe.title = `${seasonContent.title} - The Bush Chapel`;
-    }
-
-    if (title) title.textContent = seasonContent.title;
-    if (description) description.textContent = seasonContent.description;
-    if (pdfLink) pdfLink.href = seasonContent.pdfUrl;
-}
-
 function rotateSeasonsGrid() {
     const seasonsGrid = document.querySelector('.seasons-grid');
     if (!seasonsGrid) return;
@@ -1371,7 +1333,6 @@ document.addEventListener('DOMContentLoaded', () => {
     updateActiveNavigation();
 
     // Auto-update liturgical content
-    updateHomepageForSeason();
     rotateSeasonsGrid();
 
     // Initialize community board if on community page
