@@ -143,7 +143,7 @@ jobs:
           fi
 
           python3 << 'PYEOF'
-          import json, re, sys
+          import json, re
 
           # Read RSS feed from temp file
           with open('/tmp/rss_feed.xml', 'r') as f:
@@ -162,50 +162,94 @@ jobs:
           except:
               archive = {'lastUpdated': '', 'videos': []}
 
+
+          def word(tl, *words):
+              """Whole-word test. Substring matching misfiles titles: 'passion'
+              hits 'compassion', 'lent' hits 'excellent'."""
+              return any(re.search(r'\b' + w + r'\b', tl) for w in words)
+
+
+          def detect_season(title):
+              tl = title.lower()
+              # Palm Sunday and Ascension name no season word of their own
+              if word(tl, 'palm sunday'):
+                  return 'lent'
+              if word(tl, 'ascension'):
+                  return 'easter'
+              if word(tl, 'lent', 'lenten', 'passion sunday'):
+                  return 'lent'
+              if word(tl, 'advent'):
+                  return 'advent'
+              if word(tl, 'christmas'):
+                  return 'christmas'
+              if word(tl, 'easter'):
+                  return 'easter'
+              if word(tl, 'pentecost'):
+                  return 'pentecost'
+              return 'ordinary-time'
+
+
+          def is_service(title):
+              """Newsletters and notices are not services. A 'Newsletter week'
+              post that names a lectionary Proper is a service, so keep it."""
+              tl = title.lower().strip()
+              if 'a note and lovely quote' in tl:
+                  return False
+              if re.match(r'^(the bush chapel[\s:-]*)?\d{4}$', tl):
+                  return False
+              if tl.startswith('newsletter') and 'proper' not in tl:
+                  return False
+              return True
+
+
+          def clean_title(title):
+              t = title.strip()
+              for prefix in ['The Bush Chapel - ', 'The Bush Chapel -  ', 'The Bush Chapel -',
+                             'The Bush Chapel: ', 'The Bush chapel: ', 'The Bush chapel - ',
+                             'Bush Chapel: ', 'Bush chapel: ']:
+                  if t.startswith(prefix):
+                      t = t[len(prefix):]
+                      break
+              return t.rstrip('.').strip()
+
+
           existing_ids = {v['id'] for v in archive['videos']}
+          feed_ids = [e[0] for e in entries]
           new_videos = []
 
           for vid_id, title, pub_date in entries:
               if vid_id in existing_ids:
                   continue
-
-              # Clean title
-              t = title.strip()
-              for prefix in ['The Bush Chapel - ', 'The Bush Chapel -  ', 'The Bush Chapel -']:
-                  if t.startswith(prefix):
-                      t = t[len(prefix):]
-              t = t.rstrip('.').strip()
-
-              # Detect season
-              tl = title.lower()
-              if 'lent' in tl or 'passion' in tl:
-                  season = 'lent'
-              elif 'advent' in tl:
-                  season = 'advent'
-              elif 'christmas' in tl:
-                  season = 'christmas'
-              elif 'easter' in tl:
-                  season = 'easter'
-              elif 'pentecost' in tl:
-                  season = 'pentecost'
-              else:
-                  season = 'ordinary-time'
+              if not is_service(title):
+                  print(f"Skipping non-service: {title}")
+                  continue
 
               date = pub_date[:10]
-              year = int(date[:4])
-
               new_videos.append({
                   'id': vid_id,
-                  'title': t,
+                  'title': clean_title(title),
                   'published': date,
-                  'season': season,
-                  'year': year
+                  'season': detect_season(title),
+                  'year': int(date[:4])
               })
 
+          # Gap detection. The RSS feed only carries the latest 15 uploads, so if
+          # NONE of them are already archived the workflow has been down long
+          # enough that older videos have fallen out of the window and can never
+          # be ingested. Backfilling those needs the uploads playlist, not RSS.
+          if feed_ids and not (set(feed_ids) & existing_ids) and archive['videos']:
+              print("::warning::None of the latest %d uploads were in the archive — "
+                    "videos may have fallen out of the RSS window and need a manual "
+                    "backfill from the uploads playlist." % len(feed_ids))
+
           if new_videos:
-              # Insert new videos at the beginning (newest first)
-              archive['videos'] = new_videos + archive['videos']
-              archive['lastUpdated'] = new_videos[0]['published']
+              # Merge and sort by date rather than blind-prepending, so a video
+              # ingested out of order still lands in the right place.
+              archive['videos'] = sorted(
+                  new_videos + archive['videos'],
+                  key=lambda v: v['published'], reverse=True
+              )
+              archive['lastUpdated'] = archive['videos'][0]['published']
 
               with open('videos.json', 'w') as f:
                   json.dump(archive, f, indent=2)
