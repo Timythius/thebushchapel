@@ -1256,6 +1256,23 @@ main {
     margin-bottom: var(--space-xs);
 }
 
+.advent-devotional-box {
+    text-align: center;
+    border: 1px solid var(--ochre-light);
+}
+
+.advent-devotional-box p:last-child {
+    margin-bottom: 0;
+}
+
+.devotional-cta-row {
+    margin: 0.5rem 0 1.5rem;
+}
+
+.devotional-cta-row .cta-button {
+    margin-top: 0;
+}
+
 .scripture-reference {
     font-weight: 600;
     color: var(--ochre);

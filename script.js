@@ -1074,7 +1074,7 @@ const liturgicalCalendar = {
     years: {
         2025: { easter: '2025-04-20', advent: '2024-11-30' },
         2026: { easter: '2026-04-05', advent: '2025-11-29' },
-        2027: { easter: '2027-03-28', advent: '2026-11-28' },
+        2027: { easter: '2027-03-28', advent: '2026-11-29' },
         2028: { easter: '2028-04-16', advent: '2027-12-03' },
         2029: { easter: '2029-04-01', advent: '2028-12-02' },
         2030: { easter: '2030-04-21', advent: '2029-12-01' },
@@ -1104,7 +1104,9 @@ const liturgicalCalendar = {
         'ordinary-time': {
             available: false
         },
-        advent: {},
+        advent: {
+            available: true
+        },
         christmas: {}
     },
 
